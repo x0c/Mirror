@@ -2,6 +2,8 @@
 
 本文件面向会在本仓库内工作的代码代理（LLM / Coding Agent）。
 
+通用工程规范：[Swift 规范](../_standards/swift.md)（新建/改造 SwiftUI 与 AppKit 层、权限、发布、macOS 交互习惯）
+
 ## 1. 项目定位
 
 Mirror 是一个简单的 macOS 原生摄像头镜像工具，使用 SwiftUI 构建。
@@ -9,6 +11,22 @@ Mirror 是一个简单的 macOS 原生摄像头镜像工具，使用 SwiftUI 构
 - 简洁：提供基础的摄像头预览。
 - 高效：支持全屏、缩放、置顶预览。
 - 原生：符合 macOS 应用规范。
+
+## 当前交付边界与数据处理
+
+**本应用当前仅供本机个人使用，不对外分发。**因此按工作区《macOS 应用标准基线》A1 的「纯自用、不对外分发」条件，当前可豁免应用内更新、公证与对外安装包；本机构建产物仍应保持可签名。不得把此豁免解释成已经具备可向他人交付的安装、更新或公开发布能力。
+
+- 保存的数据：镜像开关、窗口位置和尺寸、透明度等预览偏好，仅保存在这台 Mac 的本地偏好存储。
+- 当前未发现的行为：不上传摄像头画面或上述偏好，也不建立网络连接。摄像头权限只用于本地实时预览；若后续增加录制、导出、网络传输、遥测或第三方服务，必须先重新核对这段说明与隐私声明，不能沿用「纯本机」结论。
+- 若未来首次交付给他人：**必须先读并落实** [签名、公证与分发指南](../_standards/workspace-docs/swift-docs/macos-signing-notarization-distribution.md)——自行分发须完成 Developer ID 签名、公证及可获得的安全更新路径；若改走 Mac App Store，则按商店更新路径验收。同时重新按实际数据收集、权限与第三方依赖核对隐私说明和 macOS 基线，完成真实安装与升级验证后才能公开。
+
+### 文档导航
+
+> 以下文档在涉及对应领域的开发、评审或排查时**必读**（先读再动手，避免踩线程模型、状态机、几何交互等隐性约束）：
+
+- `docs/CAMERA_SESSION_KNOWLEDGE_BASE.md`：摄像头权限状态机、采集会话配置与生命周期、设备选择、中心舞台、权限降级与恢复
+- `docs/MIRROR_WINDOW_KNOWLEDGE_BASE.md`：镜像窗口几何交互（拖拽/缩放/透明度）、位置持久化、圆形裁剪预览、隐藏时机
+- `docs/MENU_BAR_ENTRY_KNOWLEDGE_BASE.md`：菜单栏入口、左右键分发、菜单项状态同步、应用生命周期与权限恢复观察
 
 ## 2. 修改要求
 
@@ -88,3 +106,13 @@ pgrep -fal '/Applications/Mirror.app/Contents/MacOS/Mirror'
 - 是否成功移动并拉起 /Applications 里面的新进程。
 - 是否验证到新进程 PID 或产物路径。
 - 如果没做到，阻塞点是什么。
+
+## 领域地图（doc-init）
+
+<!-- 覆盖度复核基线：2026-08-08 · 源码指纹 6 个 Swift 文件 + Info.plist（git 跟踪共 14 文件）/ Swift 6 · 0 子模块 · 基线提交 4eb911f -->
+
+| 领域 | 入口锚点 |
+|------|---------|
+| 摄像头采集与权限 | MirrorApp/CameraSessionManager.swift |
+| 镜像窗口与交互 | MirrorApp/MirrorWindowController.swift · MirrorApp/CameraPreviewView.swift |
+| 菜单栏入口与生命周期 | MirrorApp/StatusBarController.swift · MirrorApp/AppDelegate.swift · MirrorApp/MirrorApp.swift |

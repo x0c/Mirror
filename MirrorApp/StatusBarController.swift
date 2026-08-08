@@ -1,4 +1,5 @@
 import AppKit
+import ServiceManagement
 
 @MainActor
 final class StatusBarController: NSObject, NSMenuDelegate {
@@ -8,6 +9,8 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let isVisibleHandler: () -> Bool
     private let toggleMirroringHandler: () -> Void
     private let isMirroredHandler: () -> Bool
+    private let launchAtLoginStatusHandler: () -> SMAppService.Status
+    private let setLaunchAtLoginEnabledHandler: (Bool) -> Void
 
     private lazy var visibilityItem = NSMenuItem(
         title: "显示镜像",
@@ -19,17 +22,31 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         action: #selector(handleToggleMirroring),
         keyEquivalent: ""
     )
+    private lazy var launchAtLoginItem = NSMenuItem(
+        title: "开机时启动 Mirror",
+        action: #selector(handleToggleLaunchAtLogin),
+        keyEquivalent: ""
+    )
+    private lazy var approveLaunchAtLoginItem = NSMenuItem(
+        title: "前往系统设置完成开机启动批准",
+        action: #selector(handleOpenLoginItemsSettings),
+        keyEquivalent: ""
+    )
 
     init(
         isVisible: @escaping () -> Bool,
         toggleVisibility: @escaping () -> Void,
         isMirrored: @escaping () -> Bool,
-        toggleMirroring: @escaping () -> Void
+        toggleMirroring: @escaping () -> Void,
+        launchAtLoginStatus: @escaping () -> SMAppService.Status,
+        setLaunchAtLoginEnabled: @escaping (Bool) -> Void
     ) {
         self.isVisibleHandler = isVisible
         self.toggleVisibilityHandler = toggleVisibility
         self.isMirroredHandler = isMirrored
         self.toggleMirroringHandler = toggleMirroring
+        self.launchAtLoginStatusHandler = launchAtLoginStatus
+        self.setLaunchAtLoginEnabledHandler = setLaunchAtLoginEnabled
         super.init()
         configureButton()
         configureMenu()
@@ -53,6 +70,8 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private func configureMenu() {
         visibilityItem.target = self
         mirroringItem.target = self
+        launchAtLoginItem.target = self
+        approveLaunchAtLoginItem.target = self
 
         let quitItem = NSMenuItem(
             title: "退出 Mirror",
@@ -65,13 +84,28 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(visibilityItem)
         menu.addItem(mirroringItem)
         menu.addItem(.separator())
+        menu.addItem(launchAtLoginItem)
+        menu.addItem(approveLaunchAtLoginItem)
+        menu.addItem(.separator())
         menu.addItem(quitItem)
-        // Intentionally do not assign `statusItem.menu` so left-click can open Mirror.
+        // 故意不把菜单挂到状态栏按钮上，这样左键单击可以直接打开镜像窗口。
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
         visibilityItem.title = isVisibleHandler() ? "隐藏镜像" : "显示镜像"
         mirroringItem.state = isMirroredHandler() ? .on : .off
+        let launchAtLoginStatus = launchAtLoginStatusHandler()
+        launchAtLoginItem.state = switch launchAtLoginStatus {
+        case .enabled:
+            .on
+        case .requiresApproval:
+            .mixed
+        case .notFound, .notRegistered:
+            .off
+        @unknown default:
+            .off
+        }
+        approveLaunchAtLoginItem.isHidden = launchAtLoginStatus != .requiresApproval
     }
 
     @objc
@@ -109,6 +143,20 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     @objc
     private func handleToggleMirroring() {
         toggleMirroringHandler()
+    }
+
+    @objc
+    private func handleToggleLaunchAtLogin() {
+        let status = launchAtLoginStatusHandler()
+        setLaunchAtLoginEnabledHandler(status != .enabled && status != .requiresApproval)
+    }
+
+    @objc
+    private func handleOpenLoginItemsSettings() {
+        guard let settingsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension") else {
+            return
+        }
+        NSWorkspace.shared.open(settingsURL)
     }
 
     @objc

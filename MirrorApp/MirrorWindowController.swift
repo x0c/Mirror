@@ -281,7 +281,7 @@ private final class DraggableHostingView<Content: View>: NSHostingView<Content> 
 }
 
 private struct MirrorContentView: View {
-    @ObservedObject var sessionManager: CameraSessionManager
+    let sessionManager: CameraSessionManager
 
     var body: some View {
         GeometryReader { proxy in
@@ -302,7 +302,7 @@ private struct MirrorContentView: View {
     private var content: some View {
         switch sessionManager.state {
         case .unauthorized:
-            placeholder(text: "请在系统设置里允许摄像头权限")
+            CameraPermissionDeniedView()
         case let .failed(message):
             placeholder(text: message)
         default:
@@ -318,6 +318,60 @@ private struct MirrorContentView: View {
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .padding(24)
+        }
+    }
+}
+
+/// 摄像头权限被拒后的降级态：说明缺了什么、怎么补，并支持直接跳系统设置。
+/// 系统提醒弹窗只出现一次，被拒后必须从这里给用户一条出口。
+private struct CameraPermissionDeniedView: View {
+    @FocusState private var isSettingsButtonFocused: Bool
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.88)
+            VStack(spacing: 12) {
+                Text("未获得摄像头权限")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+                Text("在系统设置里允许摄像头访问后，镜子才能显示画面")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+
+                Button(action: openCameraSettings) {
+                    Text("打开系统设置")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                }
+                .buttonStyle(.plain)
+                .background(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(Color.white.opacity(isSettingsButtonFocused ? 0.34 : 0.18))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .stroke(isSettingsButtonFocused ? Color.white : Color.clear, lineWidth: 2)
+                )
+                // 去掉系统默认的蓝色焦点框，改用上面的自绘焦点态，保证键盘导航依然可见。
+                .focusEffectDisabled()
+                .focused($isSettingsButtonFocused)
+                .accessibilityLabel("打开摄像头设置")
+                .accessibilityHint("在系统设置中允许 Mirror 使用摄像头。")
+            }
+            .padding(24)
+        }
+    }
+
+    private func openCameraSettings() {
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera") else {
+            return
+        }
+        if !NSWorkspace.shared.open(url),
+           let fallbackURL = URL(string: "x-apple.systempreferences:com.apple.preference.security") {
+            NSWorkspace.shared.open(fallbackURL)
         }
     }
 }
@@ -359,6 +413,7 @@ extension NSWindow {
     }
 }
 
+@MainActor
 struct MirrorResizeState {
     static let minSize: CGFloat = 160
     static let maxSize: CGFloat = 520

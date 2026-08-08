@@ -1,11 +1,14 @@
-@preconcurrency import AVFoundation
 import Foundation
+import Observation
+@preconcurrency import AVFoundation
 
 private enum CameraPreferenceKey {
     static let isMirrored = "mirror.preview.isMirrored"
 }
 
-final class CameraSessionManager: NSObject, ObservableObject, @unchecked Sendable {
+@MainActor
+@Observable
+final class CameraSessionManager {
     enum State {
         case idle
         case unauthorized
@@ -13,19 +16,19 @@ final class CameraSessionManager: NSObject, ObservableObject, @unchecked Sendabl
         case failed(String)
     }
 
-    @MainActor @Published private(set) var state: State = .idle
-    @MainActor @Published private(set) var isMirrored = CameraSessionManager.storedIsMirroredPreference()
+    private(set) var state: State = .idle
+    private(set) var isMirrored = CameraSessionManager.storedIsMirroredPreference()
 
-    let session = AVCaptureSession()
+    /// 采集会话交给后台队列管理，不参与界面观察。
+    nonisolated(unsafe) let session = AVCaptureSession()
 
-    private let sessionQueue = DispatchQueue(label: "com.x0c.mirror.camera")
-    @MainActor private var isConfigured = false
+    nonisolated private let sessionQueue = DispatchQueue(label: "com.x0c.mirror.camera")
+    private var isConfigured = false
 
-    override init() {
-        super.init()
+    init() {
+        observeSessionRuntimeErrors()
     }
 
-    @MainActor
     func toggleMirroring() {
         isMirrored.toggle()
         UserDefaults.standard.set(isMirrored, forKey: CameraPreferenceKey.isMirrored)
@@ -42,12 +45,12 @@ final class CameraSessionManager: NSObject, ObservableObject, @unchecked Sendabl
     func start() {
         Task {
             await prepareIfNeeded()
-            let currentState = await MainActor.run { state }
-            if case .unauthorized = currentState {
+
+            switch state {
+            case .unauthorized, .failed:
                 return
-            }
-            if case .failed = currentState {
-                return
+            default:
+                break
             }
 
             sessionQueue.async { [session] in
@@ -70,11 +73,22 @@ final class CameraSessionManager: NSObject, ObservableObject, @unchecked Sendabl
             session.stopRunning()
         }
 
-        Task { @MainActor in
-            if case .running = state {
-                state = .idle
-            }
+        if case .running = state {
+            state = .idle
         }
+    }
+
+    /// 系统设置里重新打开摄像头授权后，回到应用时自动恢复采集。
+    func recheckAuthorization() {
+        guard case .unauthorized = state else {
+            return
+        }
+        guard AVCaptureDevice.authorizationStatus(for: .video) == .authorized else {
+            return
+        }
+
+        stop()
+        start()
     }
 
     private func prepareIfNeeded() async {
@@ -86,20 +100,15 @@ final class CameraSessionManager: NSObject, ObservableObject, @unchecked Sendabl
             if granted {
                 await configureSessionIfNeeded()
             } else {
-                await MainActor.run {
-                    state = .unauthorized
-                }
-            }
-        default:
-            await MainActor.run {
                 state = .unauthorized
             }
+        default:
+            state = .unauthorized
         }
     }
 
     private func configureSessionIfNeeded() async {
-        let alreadyConfigured = await MainActor.run { isConfigured }
-        guard !alreadyConfigured else {
+        guard !isConfigured else {
             return
         }
 
@@ -135,18 +144,38 @@ final class CameraSessionManager: NSObject, ObservableObject, @unchecked Sendabl
                 }
             }
 
-            await MainActor.run {
-                isConfigured = true
-                state = .idle
-            }
+            isConfigured = true
+            state = .idle
         } catch {
-            await MainActor.run {
-                state = .failed(error.localizedDescription)
+            state = .failed(error.localizedDescription)
+        }
+    }
+
+    /// 用户在系统设置里撤销授权时，正在运行的采集会被系统打断并上报错误；
+    /// 把这类错误识别为权限问题，切到降级态而不是表现成莫名的黑屏。
+    private func observeSessionRuntimeErrors() {
+        NotificationCenter.default.addObserver(
+            forName: .AVCaptureSessionRuntimeError,
+            object: session,
+            queue: .main
+        ) { [weak self] notification in
+            guard
+                let self,
+                let error = notification.userInfo?[AVCaptureSessionErrorKey] as? NSError,
+                error.domain == AVFoundationErrorDomain,
+                error.code == AVError.Code.contentIsNotAuthorized.rawValue
+            else {
+                return
+            }
+
+            Task { @MainActor in
+                self.state = .unauthorized
+                self.stop()
             }
         }
     }
 
-    private static func makePreferredCameraDevice() -> AVCaptureDevice? {
+    private nonisolated static func makePreferredCameraDevice() -> AVCaptureDevice? {
         let deviceTypes: [AVCaptureDevice.DeviceType] = [
             .builtInWideAngleCamera,
             .deskViewCamera,
@@ -163,7 +192,7 @@ final class CameraSessionManager: NSObject, ObservableObject, @unchecked Sendabl
         return discovery.devices.first ?? AVCaptureDevice.default(for: .video)
     }
 
-    private static func enableCenterStageIfSupported(for device: AVCaptureDevice) {
+    private nonisolated static func enableCenterStageIfSupported(for device: AVCaptureDevice) {
         guard #available(macOS 12.3, *), device.activeFormat.isCenterStageSupported else {
             return
         }
