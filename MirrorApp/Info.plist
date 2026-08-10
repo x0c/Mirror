@@ -26,5 +26,17 @@
 	<string>需要访问前置摄像头来显示镜子画面。</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2026 x0c</string>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://github.com/x0c/Mirror-updates/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>sb9Ck3tZK1sEwUR2N/gLkNsiLcCX0J6FpP+Dft9VKck=</string>
+	<key>SURequireSignedFeed</key>
+	<true/>
+	<key>SUVerifyUpdateBeforeExtraction</key>
+	<true/>
 </dict>
 </plist>

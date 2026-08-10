@@ -11,6 +11,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let isMirroredHandler: () -> Bool
     private let launchAtLoginStatusHandler: () -> SMAppService.Status
     private let setLaunchAtLoginEnabledHandler: (Bool) -> Void
+    private let checkForUpdatesHandler: () -> Void
 
     private lazy var visibilityItem = NSMenuItem(
         title: "显示镜像",
@@ -32,6 +33,11 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         action: #selector(handleOpenLoginItemsSettings),
         keyEquivalent: ""
     )
+    private lazy var checkForUpdatesItem = NSMenuItem(
+        title: "检查更新…",
+        action: #selector(handleCheckForUpdates),
+        keyEquivalent: ""
+    )
 
     init(
         isVisible: @escaping () -> Bool,
@@ -39,7 +45,8 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         isMirrored: @escaping () -> Bool,
         toggleMirroring: @escaping () -> Void,
         launchAtLoginStatus: @escaping () -> SMAppService.Status,
-        setLaunchAtLoginEnabled: @escaping (Bool) -> Void
+        setLaunchAtLoginEnabled: @escaping (Bool) -> Void,
+        checkForUpdates: @escaping () -> Void
     ) {
         self.isVisibleHandler = isVisible
         self.toggleVisibilityHandler = toggleVisibility
@@ -47,6 +54,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         self.toggleMirroringHandler = toggleMirroring
         self.launchAtLoginStatusHandler = launchAtLoginStatus
         self.setLaunchAtLoginEnabledHandler = setLaunchAtLoginEnabled
+        self.checkForUpdatesHandler = checkForUpdates
         super.init()
         configureButton()
         configureMenu()
@@ -72,6 +80,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         mirroringItem.target = self
         launchAtLoginItem.target = self
         approveLaunchAtLoginItem.target = self
+        checkForUpdatesItem.target = self
 
         let quitItem = NSMenuItem(
             title: "退出 Mirror",
@@ -86,6 +95,8 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(launchAtLoginItem)
         menu.addItem(approveLaunchAtLoginItem)
+        menu.addItem(.separator())
+        menu.addItem(checkForUpdatesItem)
         menu.addItem(.separator())
         menu.addItem(quitItem)
         // 故意不把菜单挂到状态栏按钮上，这样左键单击可以直接打开镜像窗口。
@@ -157,6 +168,11 @@ final class StatusBarController: NSObject, NSMenuDelegate {
             return
         }
         NSWorkspace.shared.open(settingsURL)
+    }
+
+    @objc
+    private func handleCheckForUpdates() {
+        checkForUpdatesHandler()
     }
 
     @objc

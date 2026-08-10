@@ -1,0 +1,622 @@
+{
+  "root": "/Users/geraltgraham/Codes/Mirror",
+  "scan": {
+    "max_files": 8000,
+    "scanned_files": 2612,
+    "truncated": false
+  },
+  "languages": [
+    {
+      "language": "Swift",
+      "file_count": 6
+    },
+    {
+      "language": "C/C++",
+      "file_count": 2
+    }
+  ],
+  "build_files": [],
+  "submodules": [],
+  "existing_docs": [
+    "AGENTS.md",
+    "README.md"
+  ],
+  "config_candidates": [
+    ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror-e0195396edc61c91b1a43d5108c729a7-VFS/all-product-headers.yaml",
+    ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror.build/Objects-normal/arm64/Mirror-OutputFileMap.json",
+    ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror.build/Objects-normal/arm64/Mirror-dependencies-1.json",
+    ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror.build/Objects-normal/arm64/Mirror.abi.json",
+    ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror.build/Objects-normal/arm64/Mirror_const_extract_protocols.json",
+    ".build/Build/Intermediates.noindex/XCBuildData/b0ee1cc339d9eb1616318e36988c4294.xcbuilddata/manifest.json",
+    ".build/Build/Products/Debug/Mirror.swiftmodule/arm64-apple-macos.abi.json",
+    "project.yml"
+  ],
+  "entry_candidates": {
+    "controller": [
+      "MirrorApp/MirrorWindowController.swift",
+      "MirrorApp/StatusBarController.swift"
+    ],
+    "service": [
+      "MirrorApp/CameraSessionManager.swift"
+    ]
+  },
+  "evidence_sources": {
+    "config_runtime": {
+      "label": "配置 / 环境",
+      "items": [
+        {
+          "path": ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror-e0195396edc61c91b1a43d5108c729a7-VFS/all-product-headers.yaml",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror.build/Objects-normal/arm64/Mirror-OutputFileMap.json",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror.build/Objects-normal/arm64/Mirror-dependencies-1.json",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror.build/Objects-normal/arm64/Mirror.abi.json",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror.build/Objects-normal/arm64/Mirror_const_extract_protocols.json",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": ".build/Build/Intermediates.noindex/XCBuildData/b0ee1cc339d9eb1616318e36988c4294.xcbuilddata/manifest.json",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": ".build/Build/Products/Debug/Mirror.swiftmodule/arm64-apple-macos.abi.json",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/units/ApplicationServices-44VH54BR2V3OIPNTX7X6RACRQ.pcm-KUU3OIYNBYL8",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": ".build/ModuleCache.noindex/1EWDO4JOHTPXW/ApplicationServices-3NXEUUZF9JJBD.pcm",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": ".build/ModuleCache.noindex/ApplicationServices-44VH54BR2V3OIPNTX7X6RACRQ.pcm",
+          "reason": "配置、环境或运行时参数候选"
+        },
+        {
+          "path": "project.yml",
+          "reason": "配置、环境或运行时参数候选"
+        }
+      ]
+    },
+    "ddl_migrations_seed": {
+      "label": "DDL / 迁移 / seed",
+      "items": [
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/10/NSMigrationManager.h-2E1W7NA6CC510",
+          "reason": "DDL、迁移、seed 或初始化数据候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/1D/NSEntityMigrationPolicy.h-2W0C87M5OIW1D",
+          "reason": "DDL、迁移、seed 或初始化数据候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/74/NSCustomMigrationStage.h-2V6RPU06YRY74",
+          "reason": "DDL、迁移、seed 或初始化数据候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/F8/NSStagedMigrationManager.h-1UCJL52Z75QF8",
+          "reason": "DDL、迁移、seed 或初始化数据候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/PS/NSMigrationStage.h-2U4K65WMHV3PS",
+          "reason": "DDL、迁移、seed 或初始化数据候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/SJ/NSLightweightMigrationStage.h-WZ6IJE6DI4SJ",
+          "reason": "DDL、迁移、seed 或初始化数据候选"
+        }
+      ]
+    },
+    "external_contracts": {
+      "label": "MQ / Webhook / 第三方契约",
+      "items": [
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/16/AVCaptureMetadataOutput.h-12IMQO4INO516",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/1X/NSFilePromiseProvider.h-1MOCXP1XADN1X",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/2F/NSItemProvider.h-3L1UC0T38Y92F",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/2W/AVAudioIONode.h-2R2MQ1VEBSI2W",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/5B/AVAssetWriter.h-1JAUWIMQMJ45B",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/5Q/NSPersistentDocument.h-195D3MQC8XB5Q",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/DG/CGDataProvider.h-2IXD2GA3QEBDG",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/E2/AVAudioUnitGenerator.h-2N0MO3MQSKCE2",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/G2/StringCompare.h-3460EQGEMQKG2",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/JZ/thread_info.h-1DMQ8IZA65PJZ",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/MQ/MTLLogState.h-43PH6XVCPQMQ",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/MQ/NSController.h-RNP1OMZIHNMQ",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/MQ/ioss.h-2A7V0VB3TGCMQ",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/MQ/user.h-1DH14OMA2G5MQ",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/NW/time_value.h-3SMQ5UZ68QANW",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/P8/Finder.h-3RMQT5HNZMNP8",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/Q2/CGRenderingBufferProvider.h-1D6II6M0QOAQ2",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/Q7/NSItemProvider.h-GIQAQHZR2XQ7",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/Q8/DriverSynchronization.h-2I566SHKQ1MQ8",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/QC/AVAudioRecorder.h-3318IG8AKCMQC",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/QS/NSMovie.h-2NKSHQS5JEMQS",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/RA/CIImageProvider.h-2G01HWQZYW8RA",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/UN/tcp_seq.h-25ZTWMQHI6UUN",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/VC/NSGradient.h-EJ8O8Z7MQMVC",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/VW/arm64e-apple-macos.swiftinterface-1JMQ7ESNCLSVW",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/WH/AVSpeechSynthesisProvider.h-1OV87217P74WH",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/X1/NSMenuItemBadge.h-22M8CRP3MQPX1",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/ZO/NSItemProvider+UTType.h-Q4OCJS4TOCZO",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/units/MachO-847CRVK07AGV10XCC2RXUY72S.pcm-1YIOLJSX937MQ",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/units/_AvailabilityInternal-DPMQKHUN3XK9NA9I17GYP0LHV.pcm-32LF1HJ2331DY",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/units/_Builtin_stdarg-DMQZZX2N68W5EO1AGQYJG4KMG.pcm-38OMNEVKT0PFP",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/units/libkern-EYZ32EMQYYH5FDATT8E5NEXH1.pcm-ARGNFEZHYV3N",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/ModuleCache.noindex/1EWDO4JOHTPXW/CoreFoundation-16SA8WK3L6MQN.pcm",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/ModuleCache.noindex/_AvailabilityInternal-DPMQKHUN3XK9NA9I17GYP0LHV.pcm",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/ModuleCache.noindex/_Builtin_stdarg-DMQZZX2N68W5EO1AGQYJG4KMG.pcm",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        },
+        {
+          "path": ".build/ModuleCache.noindex/libkern-EYZ32EMQYYH5FDATT8E5NEXH1.pcm",
+          "reason": "消息、回调、SDK 或外部契约候选"
+        }
+      ]
+    },
+    "generated_metadata": {
+      "label": "生成代码 / 元数据 / 流程配置",
+      "items": [
+        {
+          "path": ".build/Build/Intermediates.noindex/Mirror.build/Debug/Mirror.build/Mirror-generated-files.hmap",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/0W/MDSchema.h-2R614WN5VSF0W",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/3V/mds_schema.h-UOKC37HD7V3V",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/7E/NSCollectionViewFlowLayout.h-3TVK2U9AYMT7E",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/E2/AVAudioUnitGenerator.h-2N0MO3MQSKCE2",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/G0/AVSampleBufferGenerator.h-1208KCE0LELG0",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/HL/CIFilterGenerator.h-31MSUMFGG5AHL",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/IT/MTProfessionalVideoWorkflow.h-2MCAC6PG6HYIT",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/L9/AVAssetImageGenerator.h-18YLNREINYL9",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/MI/AVCaptureSpatialAudioMetadataSampleGenerator.h-1PKJRVWLBLWMI",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/QH/overflow.h-3BGG2ES81BQH",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/W6/NSGlyphGenerator.h-13H1QJA24CAW6",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/ZW/AVCaptureTimecodeGenerator.h-2PW2TPKHP0NZW",
+          "reason": "生成代码、元数据、流程或规则配置候选"
+        }
+      ]
+    },
+    "logs_metrics": {
+      "label": "日志 / 指标 / 告警",
+      "items": [
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/6J/AVMetrics.h-317S34OSCSV6J",
+          "reason": "日志、指标、告警或 tracing 候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/FH/AVVideoPerformanceMetrics.h-2WR37QYIBIAFH",
+          "reason": "日志、指标、告警或 tracing 候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/UK/NSAlert.h-262BJ953AMUK",
+          "reason": "日志、指标、告警或 tracing 候选"
+        }
+      ]
+    },
+    "permissions_dictionary": {
+      "label": "权限 / 菜单 / 字典 / 枚举配置",
+      "items": [
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/2D/CFDictionary.h-3UWCB260AZV2D",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/49/HIMenuView.h-33OZO9EZD0449",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/4J/CFURLEnumerator.h-388V0Q6XAC24J",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/5D/Menus.h-1WQZGQOQVS25D",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/60/menu.h-3LX8AZI101L60",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/80/NSMenuItemCell.h-192ZQ4QZEST80",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/9I/CFHTTPAuthentication.h-3TPUIIZ01YW9I",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/AA/AuthorizationPlugin.h-1XHHZUSZ52DAA",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/BQ/kauth.h-2QEYJQXJ0VMBQ",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/C9/NSEnumerator.h-9KZWGXKAYHC9",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/DK/AuthSession.h-OZ7UT3YYNGDK",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/EJ/AXRoleConstants.h-VSWYCQ131YEJ",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/EL/SpatialEnumerations.h-16R7BR490AFEL",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/G4/NSDictionaryController.h-K2J0WC4AVBG4",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/H3/NSDictionary.h-ZP1L5YQZVBH3",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/H9/CSIdentityAuthority.h-2E2IBZQ2ZI1H9",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/JY/AuthorizationDB.h-348WC36GVHJY",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/KS/NSMenu.h-1X24KM6KU83KS",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/QP/NSMenuToolbarItem.h-2J33Y8CD2OBQP",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/TR/Enumerator.h-27TM83AM7FCTR",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/UN/AuthorizationTags.h-JKGPQ8TBIPUN",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/WS/Authorization.h-HG9OU6Z5MCWS",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/X1/NSMenuItemBadge.h-22M8CRP3MQPX1",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/X7/NSMenuItem.h-2659HEGJYIQX7",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/Y4/DictionaryServices.h-1IDKZFOIKD6Y4",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/YO/ptrauth.h-L798W7H4ZJYO",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/ZE/CGPDFDictionary.h-2ZDW6R5PEBIZE",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/records/ZL/NSURLAuthenticationChallenge.h-1GXN888RYIBZL",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/Index.noindex/DataStore/v5/units/ptrauth-5GJP1HRZQPQTLFFQLF9B016G8.pcm-15Y1JIVNUX390",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/ModuleCache.noindex/1EWDO4JOHTPXW/ptrauth-19KE09ZDXQ6Q3.pcm",
+          "reason": "权限、菜单、字典或枚举候选"
+        },
+        {
+          "path": ".build/ModuleCache.noindex/ptrauth-5GJP1HRZQPQTLFFQLF9B016G8.pcm",
+          "reason": "权限、菜单、字典或枚举候选"
+        }
+      ]
+    },
+    "runtime_validation": {
+      "label": "运行时验证入口",
+      "items": [
+        {
+          "path": "README.md",
+          "reason": "构建、启动、验证或本地调试入口候选"
+        }
+      ]
+    },
+    "tests": {
+      "label": "测试 / fixture / mock",
+      "items": [
+        {
+          "path": ".build/Logs/Test/LogStoreManifest.plist",
+          "reason": "路径或文件名显示为测试、fixture 或 mock"
+        }
+      ]
+    }
+  },
+  "extension_summary": [
+    {
+      "extension": ".pcm",
+      "count": 142
+    },
+    {
+      "extension": ".plist",
+      "count": 9
+    },
+    {
+      "extension": ".d",
+      "count": 7
+    },
+    {
+      "extension": ".dia",
+      "count": 7
+    },
+    {
+      "extension": ".hmap",
+      "count": 6
+    },
+    {
+      "extension": ".o",
+      "count": 6
+    },
+    {
+      "extension": ".swiftconstvalues",
+      "count": 6
+    },
+    {
+      "extension": ".swiftdeps",
+      "count": 6
+    },
+    {
+      "extension": ".json",
+      "count": 6
+    },
+    {
+      "extension": ".swift",
+      "count": 6
+    },
+    {
+      "extension": ".xcactivitylog",
+      "count": 5
+    },
+    {
+      "extension": ".txt",
+      "count": 3
+    },
+    {
+      "extension": ".shared",
+      "count": 3
+    },
+    {
+      "extension": ".md",
+      "count": 2
+    },
+    {
+      "extension": ".h",
+      "count": 2
+    },
+    {
+      "extension": ".swiftdoc",
+      "count": 2
+    },
+    {
+      "extension": ".swiftmodule",
+      "count": 2
+    },
+    {
+      "extension": ".swiftsourceinfo",
+      "count": 2
+    },
+    {
+      "extension": ".dylib",
+      "count": 2
+    },
+    {
+      "extension": ".yml",
+      "count": 1
+    },
+    {
+      "extension": ".yaml",
+      "count": 1
+    },
+    {
+      "extension": ".dependencymetadatafilelist",
+      "count": 1
+    },
+    {
+      "extension": ".dependencystaticmetadatafilelist",
+      "count": 1
+    },
+    {
+      "extension": ".xcent",
+      "count": 1
+    },
+    {
+      "extension": ".der",
+      "count": 1
+    },
+    {
+      "extension": ".dep",
+      "count": 1
+    },
+    {
+      "extension": ".stringsdata",
+      "count": 1
+    },
+    {
+      "extension": ".resp",
+      "count": 1
+    },
+    {
+      "extension": ".priors",
+      "count": 1
+    },
+    {
+      "extension": ".linkfilelist",
+      "count": 1
+    }
+  ],
+  "recommended_hidden_semantics_refs": [],
+  "depth_scanner_hint": "运行 depth_scanner.py --inventory <本文件> 可获取状态机/并发控制/事件/组件等深层知识候选",
+  "notes": [
+    "本报告只提供机械候选事实，业务域边界仍需由 Agent 结合代码、资料、数据库和用户输入判断。",
+    "entry_candidates 按文件名/路径启发式识别，可能包含误报和漏报。",
+    "深度知识提取（状态枚举/并发模式/事件联动/组件索引）由 depth_scanner.py 单独完成。"
+  ]
+}

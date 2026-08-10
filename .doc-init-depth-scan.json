@@ -1,0 +1,79 @@
+{
+  "scan_timestamp": "2026-08-08T04:32:00.111558+00:00",
+  "language_stack": [
+    "Swift",
+    "C/C++"
+  ],
+  "status_patterns": [],
+  "concurrency_patterns": [],
+  "event_patterns": [],
+  "framework_components": [],
+  "soft_delete_patterns": [],
+  "idempotency_patterns": [],
+  "entity_fields": [],
+  "json_field_patterns": [],
+  "runnable_project": {
+    "type": "unknown",
+    "ports": [],
+    "start_commands": [],
+    "log_paths": []
+  },
+  "hot_files": [
+    {
+      "file": ".gitignore",
+      "commit_count": 1
+    },
+    {
+      "file": "AGENTS.md",
+      "commit_count": 1
+    },
+    {
+      "file": "LICENSE",
+      "commit_count": 1
+    },
+    {
+      "file": "Mirror.xcodeproj/project.pbxproj",
+      "commit_count": 1
+    },
+    {
+      "file": "Mirror.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+      "commit_count": 1
+    },
+    {
+      "file": "MirrorApp/AppDelegate.swift",
+      "commit_count": 1
+    },
+    {
+      "file": "MirrorApp/CameraPreviewView.swift",
+      "commit_count": 1
+    },
+    {
+      "file": "MirrorApp/CameraSessionManager.swift",
+      "commit_count": 1
+    },
+    {
+      "file": "MirrorApp/Info.plist",
+      "commit_count": 1
+    },
+    {
+      "file": "MirrorApp/MirrorApp.swift",
+      "commit_count": 1
+    },
+    {
+      "file": "MirrorApp/MirrorWindowController.swift",
+      "commit_count": 1
+    },
+    {
+      "file": "MirrorApp/StatusBarController.swift",
+      "commit_count": 1
+    },
+    {
+      "file": "README.md",
+      "commit_count": 1
+    },
+    {
+      "file": "project.yml",
+      "commit_count": 1
+    }
+  ]
+}

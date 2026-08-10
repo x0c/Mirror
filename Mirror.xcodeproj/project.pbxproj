@@ -12,6 +12,7 @@
 		1F52D1087DF11832349B8BAE /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */; };
 		350D6E0D3908E23D56C72158 /* MirrorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0246326DA58632EA987559B9 /* MirrorWindowController.swift */; };
 		4BCAABE5B90056AC2FA66E3B /* MirrorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BDA81A34E10BAA089954096 /* MirrorApp.swift */; };
+		72D5C296EDF876AE28E7A601 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 602BFFF476991A9B6215E2AC /* Sparkle */; };
 		746DBF28E92F9C8C1A354D1F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D823A35DF15C8E2262C1DB /* AppDelegate.swift */; };
 		D206BA69CCFCBD821C5FC0EC /* CameraSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */; };
 /* End PBXBuildFile section */
@@ -27,6 +28,17 @@
 		CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		F83C6AEEDEDBC96ACB2EA50A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F03CBD3DCB58DB2C0ABD4091 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72D5C296EDF876AE28E7A601 /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0B5F21E16C5E59EABA2F322C /* MirrorApp */ = {
@@ -69,6 +81,7 @@
 			buildPhases = (
 				5AE1BB719A8672AF16E99576 /* Sources */,
 				3A10D8E745F91A781DE63CD2 /* Resources */,
+				F03CBD3DCB58DB2C0ABD4091 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -76,6 +89,7 @@
 			);
 			name = Mirror;
 			packageProductDependencies = (
+				602BFFF476991A9B6215E2AC /* Sparkle */,
 			);
 			productName = Mirror;
 			productReference = 1AEC7BFFF344962F26EC8458 /* Mirror.app */;
@@ -91,7 +105,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					641264E2E78C798538194157 = {
-						ProvisioningStyle = Automatic;
+						DevelopmentTeam = SHZQ3MWP3B;
 					};
 				};
 			};
@@ -104,6 +118,9 @@
 			);
 			mainGroup = 60677C36157AC41ADAC5FABD;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4A1F7A8FFA4D2D5F62AA37E1 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EDE85CD2407C4419DCBF8395 /* Products */;
 			projectDirPath = "";
@@ -178,6 +195,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = SHZQ3MWP3B;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -214,14 +232,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -260,9 +278,13 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = SHZQ3MWP3B;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -276,12 +298,13 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				PRODUCT_NAME = Mirror;
 				SDKROOT = macosx;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 			};
@@ -292,14 +315,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -327,6 +350,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4A1F7A8FFA4D2D5F62AA37E1 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		602BFFF476991A9B6215E2AC /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4A1F7A8FFA4D2D5F62AA37E1 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 40C4CEA8C08ECEDEDE5DCC84 /* Project object */;
 }

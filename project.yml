@@ -14,7 +14,22 @@ settings:
     SWIFT_APPROACHABLE_CONCURRENCY: YES
     MACOSX_DEPLOYMENT_TARGET: "14.0"
     CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: SHZQ3MWP3B
     PRODUCT_NAME: Mirror
+  configs:
+    Release:
+      CODE_SIGN_STYLE: Manual
+      CODE_SIGN_IDENTITY: "Developer ID Application"
+      ENABLE_HARDENED_RUNTIME: YES
+      OTHER_CODE_SIGN_FLAGS: "--timestamp"
+      CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+      # Xcode 26.3 会在该项目泛型 AppKit 视图的析构路径触发 Swift 优化器崩溃；待工具链修复前禁用 Release 优化。
+      SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.9.4"
 
 targets:
   Mirror:
@@ -27,8 +42,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.x0c.mirror
         INFOPLIST_FILE: MirrorApp/Info.plist
-        MARKETING_VERSION: "1.0.2"
-        CURRENT_PROJECT_VERSION: "3"
+        MARKETING_VERSION: "1.0.3"
+        CURRENT_PROJECT_VERSION: "4"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:
       path: MirrorApp/Info.plist
       properties:
@@ -38,3 +54,12 @@ targets:
         LSUIElement: true
         NSCameraUsageDescription: 需要访问前置摄像头来显示镜子画面。
         NSHumanReadableCopyright: "Copyright © 2026 x0c"
+        SUFeedURL: "https://github.com/x0c/Mirror-updates/releases/latest/download/appcast.xml"
+        SUEnableAutomaticChecks: true
+        SUAutomaticallyUpdate: true
+        SURequireSignedFeed: true
+        SUVerifyUpdateBeforeExtraction: true
+        SUPublicEDKey: "sb9Ck3tZK1sEwUR2N/gLkNsiLcCX0J6FpP+Dft9VKck="
+    dependencies:
+      - package: Sparkle
+        product: Sparkle

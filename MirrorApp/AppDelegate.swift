@@ -1,8 +1,14 @@
 import AppKit
 import ServiceManagement
+import Sparkle
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusBarController: StatusBarController?
+    private let updaterController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: nil
+    )
     private var mirrorWindowController: MirrorWindowController?
     private var cameraPermissionObserver: NSObjectProtocol?
 
@@ -44,6 +50,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 } catch {
                     NSLog("Mirror 开机自启动设置失败：%@", error.localizedDescription)
                 }
+            },
+            checkForUpdates: { [weak self] in
+                self?.updaterController.checkForUpdates(nil)
             }
         )
     }

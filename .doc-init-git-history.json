@@ -1,0 +1,154 @@
+{
+  "scan": {
+    "root": "/Users/geraltgraham/Codes/Mirror",
+    "generated_at": "2026-08-08T04:31:53+00:00",
+    "git_available": true,
+    "status": "ok",
+    "shallow_repository": false,
+    "max_commits": 300,
+    "paths_filter": [],
+    "effective_paths_filter": [],
+    "scanned_commits": 1
+  },
+  "weak_signal_policy": "Git 历史是高噪声弱信号，只能用于热点、历史叫法和 Q&A 线索；需要代码、数据库、运行时或用户确认后才能落入 KB/Guide。",
+  "hot_paths": [
+    {
+      "path": ".gitignore",
+      "commit_count": 1
+    },
+    {
+      "path": "LICENSE",
+      "commit_count": 1
+    },
+    {
+      "path": "Mirror.xcodeproj/project.pbxproj",
+      "commit_count": 1
+    },
+    {
+      "path": "Mirror.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/AppDelegate.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/CameraPreviewView.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/CameraSessionManager.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/Info.plist",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/MirrorApp.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/MirrorWindowController.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/StatusBarController.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "README.md",
+      "commit_count": 1
+    },
+    {
+      "path": "project.yml",
+      "commit_count": 1
+    }
+  ],
+  "hot_directories": [
+    {
+      "path": ".gitignore",
+      "commit_count": 1
+    },
+    {
+      "path": "LICENSE",
+      "commit_count": 1
+    },
+    {
+      "path": "Mirror.xcodeproj/project.pbxproj",
+      "commit_count": 1
+    },
+    {
+      "path": "Mirror.xcodeproj/project.xcworkspace",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/AppDelegate.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/CameraPreviewView.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/CameraSessionManager.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/Info.plist",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/MirrorApp.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/MirrorWindowController.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "MirrorApp/StatusBarController.swift",
+      "commit_count": 1
+    },
+    {
+      "path": "README.md",
+      "commit_count": 1
+    },
+    {
+      "path": "project.yml",
+      "commit_count": 1
+    }
+  ],
+  "keyword_hits": [],
+  "cochange_groups": [],
+  "term_candidates": [
+    {
+      "term": "public",
+      "count": 1,
+      "sample_subjects": [
+        "Initial public release of Mirror."
+      ]
+    },
+    {
+      "term": "release",
+      "count": 1,
+      "sample_subjects": [
+        "Initial public release of Mirror."
+      ]
+    },
+    {
+      "term": "Mirror",
+      "count": 1,
+      "sample_subjects": [
+        "Initial public release of Mirror."
+      ]
+    }
+  ],
+  "domain_path_summaries": [],
+  "qa_prompts": [
+    "Git 历史里出现这些叫法：public、release、Mirror。它们和当前代码/表/接口中的叫法是否指同一概念？最终文档正文统一用哪个？"
+  ],
+  "notes": [
+    "Git 历史只作为弱信号，不得单独写成当前业务规则。"
+  ]
+}
