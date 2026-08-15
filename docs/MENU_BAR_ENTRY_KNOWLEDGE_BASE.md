@@ -112,7 +112,7 @@ stateDiagram-v2
 
 ### 2.5 权限恢复观察（`observeCameraReactivation`）
 
-系统权限恢复路径：用户在系统设置授权 → 切回 Mirror（应用变成 active）→ `didBecomeActive` 通知 → `recheckAuthorization()` → 若当前状态为 unauthorized 且系统已授权 → 自动重新开始采集。**无手动重试 UI**（这是本应用的既定语义：会话区不提供重试按钮）。
+系统权限恢复路径：用户在系统设置授权后，采集域会从多条入口自动重检（`didBecomeActive`、窗口变 key、降级态出现与轮询）。菜单栏应用经常收不到 active，**不能只靠这一条**。**无手动重试 UI**（这是本应用的既定语义：会话区不提供重试按钮）。
 
 - 仅在 `.unauthorized` 状态下有意义（见采集 KB 状态机）；`.failed`（无摄像头/输入错误）不会因 active 而自动恢复。
 - 观察者保存在 `cameraPermissionObserver` 属性防回收（实际上 `NotificationCenter.addObserver` 返回 token 并被持有，见 §6）。
@@ -141,7 +141,7 @@ stateDiagram-v2
 | 菜单项动作 | StatusBar | `handleToggleVisibility` / `handleToggleMirroring` / `handleQuit` | 三个 @objc 动作 |
 | 显示/隐藏窗口 | 窗口控制器 | `MirrorWindowController.toggle()` | 闭包 `toggleVisibility` 指向它 |
 | 镜像偏好切换 | 会话管理器 | `CameraSessionManager.toggleMirroring()` | 菜单「水平镜像」项动作指向它 |
-| 权限恢复 | 会话管理器 | `CameraSessionManager.recheckAuthorization()` | 仅由 AppDelegate 的 active 通知驱动，菜单不直接触发 |
+| 权限恢复 | 会话管理器 | `CameraSessionManager.recheckAuthorization()` | 菜单不直接触发；窗口与降级态会轮询，不能只靠 active 通知 |
 | 权限观察 | AppDelegate | `AppDelegate.observeCameraReactivation(_:)` | `didBecomeActive` 通知 |
 
 ## §4 持久化入口索引
@@ -187,8 +187,8 @@ stateDiagram-v2
   ```bash
   tccutil reset Camera com.x0c.mirror    # 重置权限
   # 重启 Mirror → 窗口内应显示「未获得摄像头权限」+「打开系统设置」按钮
-  # 打开系统设置对此应用开启摄像头 → 切回 Mirror（无需点任何按钮）
-  # → 画面自动恢复（走 didBecomeActive → recheckAuthorization）
+  # 打开系统设置对此应用开启摄像头 → 不必点镜子、也不必特意切回前台
+  # → 约 1 秒内画面自动恢复（降级态轮询 recheckAuthorization）
   ```
   注意：只有「权限被拒」态走这条链路；无摄像头（failed）不恢复。
 - 菜单状态一致性：窗口可见时打开菜单（应显示「隐藏镜像」），用其他方式隐藏窗口（如双击窗口）后再次打开菜单（应显示「显示镜像」）——两步是对同一个 `isVisible` 事实源。

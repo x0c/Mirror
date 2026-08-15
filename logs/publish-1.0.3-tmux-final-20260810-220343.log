@@ -47,3 +47,22 @@ override=security disabled
 /Applications/Mirror.app: satisfies its Designated Requirement
 
 ▶ 提交源码、创建标签并发布首装包
+[main 737bbad] 发布 Mirror 1.0.3
+ 17 files changed, 1259 insertions(+), 13 deletions(-)
+ create mode 100644 .doc-init-depth-scan.json
+ create mode 100644 .doc-init-git-history.json
+ create mode 100644 .doc-init-project-inventory.json
+ create mode 100644 Mirror.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+ create mode 100644 docs/DISTRIBUTION_KNOWLEDGE_BASE.md
+ create mode 100644 logs/publish-1.0.3-20260810-215422.log
+ create mode 100644 logs/publish-1.0.3-tmux-20260810-220034.log
+ create mode 100644 logs/publish-1.0.3-tmux-final-20260810-220343.log
+ create mode 100644 logs/publish-1.0.3-tmux-retry-20260810-220125.log
+ create mode 100755 scripts/publish-release.sh
+To https://github.com/x0c/Mirror.git
+   d4c33eb..737bbad  main -> main
+ * [new tag]         v1.0.3 -> v1.0.3
+https://github.com/x0c/Mirror/releases/tag/v1.0.3
+
+▶ 生成并发布签名更新清单
+Cloning into '/var/folders/vh/rjmstnq923sd_d1w8mn9c0fw0000gn/T/tmp.OOQ8PLNw4N/Mirror-updates'...

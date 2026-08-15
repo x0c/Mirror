@@ -114,6 +114,10 @@ final class MirrorWindowController: NSWindowController, NSWindowDelegate {
         hasPositionedWindow = true
     }
 
+    func windowDidBecomeKey(_ notification: Notification) {
+        sessionManager.recheckAuthorization()
+    }
+
     func windowDidMove(_ notification: Notification) {
         guard !isInteractiveResizeInProgress else {
             return
@@ -302,7 +306,7 @@ private struct MirrorContentView: View {
     private var content: some View {
         switch sessionManager.state {
         case .unauthorized:
-            CameraPermissionDeniedView()
+            CameraPermissionDeniedView(sessionManager: sessionManager)
         case let .failed(message):
             placeholder(text: message)
         default:
@@ -325,6 +329,7 @@ private struct MirrorContentView: View {
 /// 摄像头权限被拒后的降级态：说明缺了什么、怎么补，并支持直接跳系统设置。
 /// 系统提醒弹窗只出现一次，被拒后必须从这里给用户一条出口。
 private struct CameraPermissionDeniedView: View {
+    let sessionManager: CameraSessionManager
     @FocusState private var isSettingsButtonFocused: Bool
 
     var body: some View {
@@ -363,15 +368,35 @@ private struct CameraPermissionDeniedView: View {
             }
             .padding(24)
         }
+        .onAppear {
+            sessionManager.recheckAuthorization()
+        }
+        // 菜单栏应用经常收不到 didBecomeActive；悬浮窗也常一直可见，不会再走 onAppear。
+        // 降级态可见期间轮询系统授权，用户在系统设置里打开开关后无需再点镜子。
+        .task {
+            while !Task.isCancelled {
+                sessionManager.recheckAuthorization()
+                try? await Task.sleep(for: .milliseconds(800))
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            sessionManager.recheckAuthorization()
+        }
     }
 
     private func openCameraSettings() {
-        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera") else {
-            return
-        }
-        if !NSWorkspace.shared.open(url),
-           let fallbackURL = URL(string: "x-apple.systempreferences:com.apple.preference.security") {
-            NSWorkspace.shared.open(fallbackURL)
+        let urls = [
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Camera",
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera",
+            "x-apple.systempreferences:com.apple.preference.security"
+        ]
+        for string in urls {
+            guard let url = URL(string: string) else {
+                continue
+            }
+            if NSWorkspace.shared.open(url) {
+                return
+            }
         }
     }
 }

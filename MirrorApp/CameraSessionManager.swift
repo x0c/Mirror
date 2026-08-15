@@ -24,6 +24,7 @@ final class CameraSessionManager {
 
     nonisolated private let sessionQueue = DispatchQueue(label: "com.x0c.mirror.camera")
     private var isConfigured = false
+    private var isStarting = false
 
     init() {
         observeSessionRuntimeErrors()
@@ -43,7 +44,14 @@ final class CameraSessionManager {
     }
 
     func start() {
+        guard !isStarting else {
+            return
+        }
+        isStarting = true
+
         Task {
+            defer { isStarting = false }
+
             await prepareIfNeeded()
 
             switch state {
@@ -78,17 +86,20 @@ final class CameraSessionManager {
         }
     }
 
-    /// 系统设置里重新打开摄像头授权后，回到应用时自动恢复采集。
+    /// 系统设置里重新打开摄像头授权（或 TCC 被 reset 回未决定）后，自动恢复采集。
+    /// 菜单栏应用经常收不到 didBecomeActive，调用方还需在窗口再显示 / 降级 UI 出现时触发。
     func recheckAuthorization() {
         guard case .unauthorized = state else {
             return
         }
-        guard AVCaptureDevice.authorizationStatus(for: .video) == .authorized else {
-            return
-        }
 
-        stop()
-        start()
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized, .notDetermined:
+            stop()
+            start()
+        default:
+            break
+        }
     }
 
     private func prepareIfNeeded() async {
@@ -109,6 +120,10 @@ final class CameraSessionManager {
 
     private func configureSessionIfNeeded() async {
         guard !isConfigured else {
+            // 曾配置成功后权限被收回再恢复时，不能卡在 .unauthorized，否则 start() 会直接 return。
+            if case .unauthorized = state {
+                state = .idle
+            }
             return
         }
 

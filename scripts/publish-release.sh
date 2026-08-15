@@ -80,6 +80,7 @@ sign_info="$(codesign -dv --verbose=2 "$APP_PATH" 2>&1)"
 entitlements="$(codesign -d --entitlements - "$APP_PATH" 2>/dev/null || true)"
 grep -q "Authority=${SIGN_IDENTITY}" <<<"$sign_info" || die "应用未使用 Developer ID 签名"
 grep -q 'flags=.*runtime' <<<"$sign_info" || die "应用未开启加固运行时"
+grep -q 'com.apple.security.device.camera' <<<"$entitlements" || die "加固运行时产物缺少摄像头 entitlement"
 ! grep -q 'get-task-allow' <<<"$entitlements" || die "应用带有调试权限"
 codesign --verify --deep --strict --verbose=2 "$APP_PATH" >/dev/null
 sparkle_bin_dir="${DERIVED_DATA}/SourcePackages/artifacts/sparkle/Sparkle/bin"

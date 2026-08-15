@@ -26,6 +26,7 @@
 		A7694174E706F8BA4FE189A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C85C787AFF011A304E57654E /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 		CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		D4E6770F8388BD9E0D219A27 /* Mirror.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Mirror.entitlements; sourceTree = "<group>"; };
 		F83C6AEEDEDBC96ACB2EA50A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -49,6 +50,7 @@
 				CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */,
 				4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */,
 				A7694174E706F8BA4FE189A3 /* Info.plist */,
+				D4E6770F8388BD9E0D219A27 /* Mirror.entitlements */,
 				2BDA81A34E10BAA089954096 /* MirrorApp.swift */,
 				0246326DA58632EA987559B9 /* MirrorWindowController.swift */,
 				C85C787AFF011A304E57654E /* StatusBarController.swift */,
@@ -231,15 +233,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -314,15 +317,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};

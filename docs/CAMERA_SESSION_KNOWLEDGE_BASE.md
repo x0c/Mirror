@@ -97,7 +97,15 @@ stateDiagram-v2
 
 ### 权限恢复流程（`recheckAuthorization()`）
 
-仅当当前状态是 `.unauthorized` 且系统权限已变成 `.authorized` 时才生效：先 `stop()` 再 `start()`，恢复采集。触发入口：AppDelegate 观察 `NSApplication.didBecomeActiveNotification`（用户从系统设置切回本应用时自动重检，无需手动点重试）。
+仅当当前状态是 `.unauthorized`，且系统权限已变成 `.authorized` **或** `.notDetermined`（例如 `tccutil reset`）时生效：先 `stop()` 再 `start()`，由 `prepareIfNeeded()` 配置或重新弹窗。若仍是 `.denied` / `.restricted` 则保持降级态。
+
+`configureSessionIfNeeded()` 在 `isConfigured == true` 时若仍停在 `.unauthorized`，会先回到 `.idle`，避免「已授权但 start() 因 unauthorized 直接 return」的死锁。
+
+触发入口（菜单栏 `LSUIElement` 经常收不到 active，悬浮窗也常一直可见不会再走 `onAppear`，故不单靠前台通知）：
+
+- `AppDelegate` 观察 `NSApplication.didBecomeActiveNotification`
+- `MirrorWindowController.windowDidBecomeKey`
+- `CameraPermissionDeniedView` 的 `onAppear`、同名 active 通知，以及降级态可见期间约 0.8 秒一次的轮询
 
 ### 配置流程（`configureSessionIfNeeded()`，一次性）
 
@@ -116,6 +124,7 @@ stateDiagram-v2
 |------|------|---------|
 | `MirrorApp/` | 全部源码（单 target `Mirror` 的 sources 目录） | `CameraSessionManager.swift`（本域核心） |
 | `MirrorApp/Info.plist` | 相机用途描述 `NSCameraUsageDescription` | 权限弹窗文案 |
+| `MirrorApp/Mirror.entitlements` | 加固运行时摄像头能力 `com.apple.security.device.camera` | Release 公证包必带；缺了则系统设置里打开开关也会被挡住 |
 | `project.yml` | XcodeGen 工程定义（唯一工程真实来源） | `bundleIdPrefix` / `deploymentTarget` / Swift 6 并发设置 |
 | `Mirror.xcodeproj/` | 由 `xcodegen generate` 生成的工程（禁止手改） | — |
 | `.build/` | xcodebuild 派生数据目录（构建产物） | `.build/Build/Products/Debug/Mirror.app` |
@@ -130,7 +139,7 @@ stateDiagram-v2
 | 采集启动 | 会话管理器 | `CameraSessionManager.start()` | 见 §2 启动主流程 |
 | 采集停止 | 会话管理器 | `CameraSessionManager.stop()` | 见 §2 停止流程 |
 | 切换水平镜像 | 会话管理器 | `CameraSessionManager.toggleMirroring()` | 切换并写 UserDefaults（key：`mirror.preview.isMirrored`） |
-| 权限恢复重检 | 会话管理器 | `CameraSessionManager.recheckAuthorization()` | 由 AppDelegate 的 active 通知驱动 |
+| 权限恢复重检 | 会话管理器 | `CameraSessionManager.recheckAuthorization()` | 由 active / 窗口变 key / 降级态 onAppear 与轮询共同驱动 |
 | 会话配置 | 会话管理器 | `CameraSessionManager.configureSessionIfNeeded()` | 一次性配置，见 §2 |
 | 设备选择 | 会话管理器 | `CameraSessionManager.makePreferredCameraDevice()` | 设备优先级见 §2 |
 | 运行时错误识别 | 会话管理器 | `CameraSessionManager.observeSessionRuntimeErrors()` | 权限撤销 → unauthorized 降级 |
@@ -153,13 +162,15 @@ stateDiagram-v2
 
 ## §6 核心业务规则与隐性约束
 
+- 【禁止】**Release / 公证包缺少摄像头 entitlement** -> 加固运行时默认禁止访问摄像头。只写 `NSCameraUsageDescription`、只在系统设置里打开开关都不够；签名里必须有 `com.apple.security.device.camera`。1.0.3 正式包 entitlements 为空，表现为「系统设置已允许，镜子仍显示未获得权限」。Debug 默认不开加固运行时，所以本机调试可能看不出这个问题。
 - 【禁止】**绕过权限检查直接启动采集** -> 必须走 `prepareIfNeeded()` 的状态机（系统对摄像头权限有硬性门禁，无权限时启动只会失败或黑屏）。
 - 【禁止】**在主线程调用 `startRunning()` / `stopRunning()` / `beginConfiguration()`** -> 必须经 `sessionQueue`（`com.x0c.mirror.camera` 串行队列）执行。**AI 易错点**：直接在主线程操作 `AVCaptureSession` 会卡 UI 或产生竞态，错误只在特定时序下出现。
 - 【禁止】**跨线程直接读写 `state` / `isMirrored`** -> 整个类 `@MainActor` 隔离；`session` 与 `sessionQueue` 是仅有的两处 `nonisolated` 跨线程桥梁，新加成员变量若被后台队列访问必须显式标注隔离。
 - 【隐性依赖】`configureSessionIfNeeded()` 是**一次性**的（`isConfigured` 标志）；改设备选择或配置逻辑后，只重启会话不会重配置，需清掉 `isConfigured` 或重建管理器实例。
 - 【隐性依赖】`stop()` 里 `guard session.isRunning` 与 `start()` 里 `guard !session.isRunning` 是幂等护栏：改启动/停止流程时必须保留，否则重复调用会出错（`stopRunning` 对未运行会话可能抛异常）。
 - 【隐性依赖】配置异常路径（`catch` 分支）也调用 `commitConfiguration()`：配置过程必须成对（begin/commit），漏掉 commit 会让会话停留在不一致状态。**AI 易错点**：往 `configureSessionIfNeeded()` 里加新配置步骤时，必须在同一闭包内成对 begin/commit，异常也要落 commit。
-- 【消歧】`state == .unauthorized` 时 `start()` 直接返回：这不是 bug，是权限门禁。要让用户重新授权后恢复，走 `recheckAuthorization()`（仅它把 unauthorized 转回 idle）。
+- 【消歧】`start()` 每次都会先 `prepareIfNeeded()` 再看状态；若权限仍被拒才返回。真正的死锁是：曾经配置成功（`isConfigured == true`）后又掉进 `.unauthorized`，再次 `start()` 时配置函数直接 return、状态不改，后面的 `unauthorized` 门禁把启动拦掉。恢复必须走 `recheckAuthorization()`，并由配置函数在「已配置但仍 unauthorized」时先回到 `.idle`。
+- 【隐性依赖】`start()` 用 `isStarting` 防重入：降级态轮询与窗口 `onAppear` 会并发触发启动，没有这道门会重复 `beginConfiguration`。
 - 【消歧】`CameraError.noCamera`（没有可用摄像头）与 `CameraError.cannotAddInput`（有设备但接入失败）都会落 `failed(String)` 状态：UI 只显示 `localizedDescription`，排查时先看是哪种错误。
 - 【隐式语义】`.AVCaptureSessionRuntimeError` 通知只有 `error.domain == AVFoundationErrorDomain && error.code == contentIsNotAuthorized` 才被识别为权限问题（→ unauthorized）；其他运行时错误会被忽略，不要改动这个过滤条件，否则权限撤销场景会变成黑屏。
 - 【隐式语义】`nonisolated(unsafe) let session`：`AVCaptureSession` 本身是线程安全的，但 `unsafe` 标记意味着编译器不检查访问隔离；新增对 `session` 的访问必须确保线程正确。
@@ -170,7 +181,8 @@ stateDiagram-v2
 - 改采集逻辑后：按项目根 `AGENTS.md` §3 的固定流程执行「杀旧进程 → xcodebuild 构建 → 替换 /Applications/Mirror.app → 拉起 → pgrep 校验」，再人工确认镜像窗口出画面、开关「水平镜像」菜单项立即翻转。
 - 验证权限降级态：
   - 重置权限：`tccutil reset Camera com.x0c.mirror`，重新启动应用 → 应显示「未获得摄像头权限」降级态与「打开系统设置」按钮，而不是黑屏或崩溃。
-  - 恢复链路：在系统设置中重新打开摄像头授权后切回应用 → 无需点重试，画面应自动恢复（`didBecomeActive` → `recheckAuthorization()`）。
+  - 恢复链路：在系统设置中重新打开摄像头授权后，**不必点镜子、也不必切回前台**，降级态轮询应在约 1 秒内自动出画面。
+  - 发版自检：`codesign -d --entitlements -` 必须含 `com.apple.security.device.camera`；`scripts/publish-release.sh` 缺此项会直接失败。
 - 编译验证：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project Mirror.xcodeproj -scheme Mirror -configuration Debug -derivedDataPath .build build`（失败时禁止继续启动流程）。
 - 注意：本应用无日志框架、无控制台输出约定；运行时行为只能通过 UI 现象与系统「控制台」App 中 Mirror 进程的 stderr 观察（待运行验证确认）。
 
