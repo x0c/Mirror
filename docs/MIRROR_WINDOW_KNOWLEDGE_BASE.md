@@ -228,6 +228,7 @@ UserDefaults 键（`MirrorPersistenceKey` 常量集中在 MirrorWindowController
 
 ## §6 核心业务规则与隐性约束
 
+- 【禁止】**只在预览层刚创建时设置一次水平镜像** -> `previewLayer.connection` 在采集 `startRunning` 之前是 nil，此时写入会被丢掉。菜单勾选来自偏好，画面要等连接建好再设一次。必须在 `AVCaptureSessionDidStartRunning`、`layout` 和 SwiftUI `updateNSView` 里**无条件**调用 `updateMirroring()`：默认就是开，SwiftUI 再赋同一个 `true` 时 `didSet` 会跳过，只靠属性变化永远套不上。连接未就绪时用图层水平翻转兜底，就绪后改回 `isVideoMirrored` 并清掉图层变换，避免翻两次。Swift 6：会话开始通知的观察 token 标 `nonisolated(unsafe)`，回调里用 `Task { @MainActor in }` 再设镜像，否则 `deinit` / 通知块编不过。
 - 【禁止】**在 SwiftUI `onAppear` 里启动采集** -> 窗口控制器在启动时就会把宿主视图装上，此时窗口尚未 `orderFront`。`onAppear` 仍会触发，造成「摄像头指示灯亮着、镜子不在屏幕上」。采集只允许由 `showMirror()` 启动，由 `hideMirror()` 停止。
 - 【禁止】**窗口未要求出画面时因权限轮询而 `start()`** -> `recheckAuthorization()` 必须先看 `isPreviewRequested`；隐藏镜子后这条标志为 false。
 - 【禁止】拖动缩放期间执行额外 `persistCurrentFrame()` —— `beginInteractiveResize()` 之后 `windowDidMove` / `windowDidResize` 会被 `isInteractiveResizeInProgress` 抑制。**若在回调里无条件落盘，会把中间帧（拖到一半）的几何写死，导致之后打开窗口位置/尺寸错位**。
@@ -255,6 +256,7 @@ UserDefaults 键（`MirrorPersistenceKey` 常量集中在 MirrorWindowController
 - 离屏兜底验收：把窗口拖到显示器外再打开 → 自动回到鼠标所在屏幕。
 - 构建验收：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project Mirror.xcodeproj -scheme Mirror -configuration Debug -derivedDataPath .build build`。
 - 运行验收（按根 AGENTS.md §3 固定流程）：替换 `/Applications/Mirror.app` 后启动并 `pgrep -fal` 校验进程；再点状态栏图标瞬时出现矩形窗口，圆形画面即时更新。
+- 水平镜像验收：偏好为开时冷启动，菜单勾选为开且**第一帧就是左右翻转**；不要再关一次再开才翻转。
 
 ## §8 关联文档
 

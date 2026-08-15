@@ -9,24 +9,28 @@ struct CameraPreviewView: NSViewRepresentable {
     func makeNSView(context: Context) -> PreviewHostingView {
         let view = PreviewHostingView(sessionManager: sessionManager)
         view.isMirrored = isMirrored
+        view.updateMirroring()
         return view
     }
 
     func updateNSView(_ nsView: PreviewHostingView, context: Context) {
         nsView.sessionManager = sessionManager
         nsView.isMirrored = isMirrored
+        nsView.updateMirroring()
     }
 }
 
 final class PreviewHostingView: NSView {
     private let previewLayer = AVCaptureVideoPreviewLayer()
     private var resizeState: MirrorResizeState?
+    nonisolated(unsafe) private var sessionRunningObserver: NSObjectProtocol?
 
     override var mouseDownCanMoveWindow: Bool { false }
 
     var sessionManager: CameraSessionManager {
         didSet {
             previewLayer.session = sessionManager.session
+            observeSessionRunning()
             updateMirroring()
         }
     }
@@ -55,7 +59,14 @@ final class PreviewHostingView: NSView {
             "transform": NSNull()
         ]
         layer?.addSublayer(previewLayer)
+        observeSessionRunning()
         updateMirroring()
+    }
+
+    deinit {
+        if let sessionRunningObserver {
+            NotificationCenter.default.removeObserver(sessionRunningObserver)
+        }
     }
 
     @available(*, unavailable)
@@ -115,18 +126,32 @@ final class PreviewHostingView: NSView {
         window?.adjustMirrorOpacity(with: event)
     }
 
-    private func updateMirroring() {
-        previewLayer.setAffineTransform(.identity)
-
-        guard let connection = previewLayer.connection else {
+    func updateMirroring() {
+        // 采集未 running 时 previewLayer.connection 为 nil，此时设 isVideoMirrored 会被丢掉；
+        // 菜单勾选已是开启，画面却不翻转，关掉再开会「突然生效」。
+        if let connection = previewLayer.connection, connection.isVideoMirroringSupported {
+            previewLayer.setAffineTransform(.identity)
+            connection.automaticallyAdjustsVideoMirroring = false
+            connection.isVideoMirrored = isMirrored
             return
         }
 
-        connection.automaticallyAdjustsVideoMirroring = false
-        guard connection.isVideoMirroringSupported else {
-            return
+        previewLayer.setAffineTransform(CGAffineTransform(scaleX: isMirrored ? -1 : 1, y: 1))
+    }
+
+    private func observeSessionRunning() {
+        if let sessionRunningObserver {
+            NotificationCenter.default.removeObserver(sessionRunningObserver)
         }
 
-        connection.isVideoMirrored = isMirrored
+        sessionRunningObserver = NotificationCenter.default.addObserver(
+            forName: .AVCaptureSessionDidStartRunning,
+            object: sessionManager.session,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.updateMirroring()
+            }
+        }
     }
 }
