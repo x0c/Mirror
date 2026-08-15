@@ -28,6 +28,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             toggleVisibility: { [weak windowController] in
                 windowController?.toggle()
             },
+            showMirror: { [weak windowController] in
+                windowController?.showMirror()
+            },
             isMirrored: {
                 sessionManager.isMirrored
             },
@@ -55,6 +58,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.updaterController.checkForUpdates(nil)
             }
         )
+
+        windowController.showMirror()
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        mirrorWindowController?.showMirror()
+        return true
     }
 
     /// 用户去系统设置重新打开摄像头授权后，切回本应用时自动重新检测，

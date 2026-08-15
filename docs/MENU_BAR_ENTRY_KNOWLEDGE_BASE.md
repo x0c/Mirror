@@ -75,12 +75,9 @@ stateDiagram-v2
 1. `NSApp.setActivationPolicy(.accessory)` —— 关键：**必须在任何窗口展示前**设置，否则 Dock 图标与菜单栏应用方式不对（见 §6）。
 2. `CameraSessionManager()` 创建会话管理器（唯一实例，之后通过闭包共享）。
 3. `observeCameraReactivation(sessionManager)`：注册 `NSApplication.didBecomeActiveNotification` 观察者，队列 `.main`，回调里 `Task { @MainActor sessionManager?.recheckAuthorization() }`（弱引用防泄漏，见 §6）。
-4. `MirrorWindowController.init(sessionManager:)` 创建窗口控制器（此时不显示）。
-5. `StatusBarController.init(isVisible:toggleVisibility:isMirrored:toggleMirroring:)`：**注入四个闭包**而非直接持对象引用，四个闭包分别为：
-   - `isVisible` → `windowController?.isVisible ?? false`
-   - `toggleVisibility` → `windowController?.toggle()`
-   - `isMirrored` → `sessionManager.isMirrored`
-   - `toggleMirroring` → `sessionManager.toggleMirroring()`
+4. `MirrorWindowController.init(sessionManager:)` 创建窗口控制器（此时不显示、也不得启动采集）。
+5. `StatusBarController.init(...)`：注入闭包而非直接持对象引用，包括 `isVisible`、`toggleVisibility`（菜单显隐）、`showMirror`（左键/启动上屏）、镜像与开机启动、检查更新。
+6. 装配完成后立刻 `windowController.showMirror()` —— 打开应用就要看到镜子。
 
 装配顺序即创建顺序；无显式依赖管理，全在 AppDelegate 方法内完成（本域规模小，不需要解耦容器）。
 
@@ -91,7 +88,7 @@ stateDiagram-v2
 - 取 `NSApp.currentEvent` 判断 **事件类型**：
   - `.rightMouseUp` → `showMenu(from: sender)`，弹菜单（从图标底部弹出）；
   - 其他（左键/中键/手势）→ `openMirrorIfNeeded()`。
-- `openMirrorIfNeeded()`：若 `isVisibleHandler()` 为真（窗口已显示）→ **不动作**（避免重复切换）；否则触发 `toggleVisibilityHandler()` = 显示。
+- `openMirrorIfNeeded()`：左键一律 `showMirror()`（已显示则置顶）。不要用「已可见就什么都不做」——窗口可能处在未上屏的幽灵状态，再点图标会再也出不来。
 
 ### 2.3 菜单同步（`menuNeedsUpdate(_:)`）
 

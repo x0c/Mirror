@@ -25,6 +25,8 @@ final class CameraSessionManager {
     nonisolated private let sessionQueue = DispatchQueue(label: "com.x0c.mirror.camera")
     private var isConfigured = false
     private var isStarting = false
+    /// 只有窗口真正要求出画面时才采集；隐藏窗口后权限轮询不得再打开摄像头。
+    private var isPreviewRequested = false
 
     init() {
         observeSessionRuntimeErrors()
@@ -44,6 +46,7 @@ final class CameraSessionManager {
     }
 
     func start() {
+        isPreviewRequested = true
         guard !isStarting else {
             return
         }
@@ -74,6 +77,7 @@ final class CameraSessionManager {
     }
 
     func stop() {
+        isPreviewRequested = false
         sessionQueue.async { [session] in
             guard session.isRunning else {
                 return
@@ -89,6 +93,9 @@ final class CameraSessionManager {
     /// 系统设置里重新打开摄像头授权（或 TCC 被 reset 回未决定）后，自动恢复采集。
     /// 菜单栏应用经常收不到 didBecomeActive，调用方还需在窗口再显示 / 降级 UI 出现时触发。
     func recheckAuthorization() {
+        guard isPreviewRequested else {
+            return
+        }
         guard case .unauthorized = state else {
             return
         }

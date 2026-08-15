@@ -6,6 +6,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     private let menu = NSMenu()
     private let toggleVisibilityHandler: () -> Void
+    private let showMirrorHandler: () -> Void
     private let isVisibleHandler: () -> Bool
     private let toggleMirroringHandler: () -> Void
     private let isMirroredHandler: () -> Bool
@@ -42,6 +43,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     init(
         isVisible: @escaping () -> Bool,
         toggleVisibility: @escaping () -> Void,
+        showMirror: @escaping () -> Void,
         isMirrored: @escaping () -> Bool,
         toggleMirroring: @escaping () -> Void,
         launchAtLoginStatus: @escaping () -> SMAppService.Status,
@@ -50,6 +52,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     ) {
         self.isVisibleHandler = isVisible
         self.toggleVisibilityHandler = toggleVisibility
+        self.showMirrorHandler = showMirror
         self.isMirroredHandler = isMirrored
         self.toggleMirroringHandler = toggleMirroring
         self.launchAtLoginStatusHandler = launchAtLoginStatus
@@ -135,10 +138,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     }
 
     private func openMirrorIfNeeded() {
-        if isVisibleHandler() {
-            return
-        }
-        toggleVisibilityHandler()
+        showMirrorHandler()
     }
 
     private func showMenu(from button: NSStatusBarButton) {

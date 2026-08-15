@@ -62,9 +62,23 @@ final class MirrorWindowController: NSWindowController, NSWindowDelegate {
         if window.isVisible {
             hideMirror()
         } else {
-            positionWindowIfNeeded(window)
-            sessionManager.start()
-            NSApp.activate(ignoringOtherApps: true)
+            showMirror()
+        }
+    }
+
+    /// 把镜子放到屏幕上再开摄像头。内容视图在窗口未显示时也会 onAppear，绝不能在那里启动采集。
+    func showMirror() {
+        guard let window else {
+            return
+        }
+
+        positionWindowIfNeeded(window)
+        sessionManager.start()
+        NSApp.activate(ignoringOtherApps: true)
+        DispatchQueue.main.async { [weak self] in
+            guard let window = self?.window else {
+                return
+            }
             window.makeKeyAndOrderFront(nil)
             window.orderFrontRegardless()
         }
@@ -296,9 +310,6 @@ private struct MirrorContentView: View {
             .background(Color.clear)
             .clipShape(Circle())
             .contentShape(Circle())
-        }
-        .onAppear {
-            sessionManager.start()
         }
     }
 

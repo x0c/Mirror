@@ -45,11 +45,11 @@
 
 ```mermaid
 graph TD
-    A[StatusBarController<br/>左键点击] -->|toggleVisibilityHandler| B[MirrorWindowController.toggle]
-    C[MirrorContentView.onAppear] -->|首次显示| B
+    A[StatusBarController<br/>左键点击] -->|showMirror| B[MirrorWindowController.showMirror]
+    C[启动完成 / 再次打开应用] -->|showMirror| B
     B -->|positionWindowIfNeeded| D[恢复持久化帧或<br/>鼠标处居中定位]
     B -->|sessionManager.start| E[采集会话<br/>CameraSessionManager]
-    B -->|makeKeyAndOrderFront + orderFrontRegardless| F[MirrorPanel 显示]
+    B -->|activate 后下一拍<br/>makeKeyAndOrderFront + orderFrontRegardless| F[MirrorPanel 显示]
     G[宿主视图<br/>DraggableHostingView/PreviewHostingView] -->|鼠标事件| H[交互分发]
     H -->|外环拖拽| I[resizeMirror 几何缩放<br/>centerInScreen 保持不变]
     H -->|双击| J[hideMirror<br/>持久化+stop+orderOut]
@@ -64,7 +64,7 @@ graph TD
 ```mermaid
 stateDiagram-v2
     [*] --> hidden: 应用启动
-    hidden --> visible: toggle()（恢复/定位帧 + start + orderFrontRegardless）
+    hidden --> visible: showMirror()（启动、左键、再次打开应用；恢复/定位帧 + start + 下一拍 orderFrontRegardless）
     visible --> hidden: hideMirror()（双击 / 菜单「隐藏镜像」；持久化 + stop + orderOut）
     visible --> visible: 拖拽移动 / 外环缩放 / 滚轮调透明度（每次变化即持久化）
 ```
@@ -91,12 +91,14 @@ stateDiagram-v2
 - **双击**：窗口上任意位置双击即隐藏并停止采集。
 - **滚轮**：窗口内任意位置滚动调整透明度（无精确滚轮时步进更大）。
 
-### 2.2 显示流程（`toggle()` 显示分支）
+### 2.2 显示流程（`showMirror()`）
 
 1. `positionWindowIfNeeded(window)`：见 2.4 定位逻辑。
-2. `sessionManager.start()`：启动采集（详见采集知识库）。
+2. `sessionManager.start()`：启动采集（详见采集知识库）。**禁止**在 SwiftUI `onAppear` 里启动——宿主视图在窗口 `orderOut` 时也会 onAppear，会把摄像头打开但窗口仍在屏幕外（表现为指示灯亮、看不见镜子）。
 3. `NSApp.activate(ignoringOtherApps: true)`：把应用拉到前台（无 Dock 图标的 accessory 应用必须主动激活）。
-4. `window.makeKeyAndOrderFront(nil)` + `window.orderFrontRegardless()`：`orderFrontRegardless` 保证在 `.floating` 层级也能立即显示。
+4. **下一个 runloop** 再 `window.makeKeyAndOrderFront(nil)` + `window.orderFrontRegardless()`：菜单栏应用必须错开一拍，否则窗口会排到别的应用后面甚至不上屏。
+
+启动装配结束、菜单栏左键、以及再次打开应用（`applicationShouldHandleReopen`）都走 `showMirror()`，不走 `toggle()`。`toggle()` 只给菜单「显示/隐藏镜像」。
 
 ### 2.3 隐藏流程（`hideMirror()`）
 
@@ -184,7 +186,8 @@ stateDiagram-v2
 | 场景 | 入口 | 类/方法/配置 | 说明 |
 |---|---|---|---|
 | 窗口创建与展示 | 窗口控制器 | `MirrorWindowController.init(sessionManager:)` | 构建 `MirrorPanel`、`DraggableHostingView`、`MirrorContentView` |
-| 显示/隐藏切换 | 窗口控制器 | `MirrorWindowController.toggle()` | 菜单栏调用的唯一显隐入口，见 §2 |
+| 显示/隐藏切换 | 窗口控制器 | `MirrorWindowController.toggle()` | 仅菜单「显示/隐藏镜像」 |
+| 显示镜子 | 窗口控制器 | `MirrorWindowController.showMirror()` | 启动、左键、再次打开应用；先定位再开采集再上屏 |
 | 隐藏窗口 | 窗口控制器 | `MirrorWindowController.hideMirror()` | 双击 / 菜单「隐藏窗口」调用 |
 | 定位窗口 | 窗口控制器 | `MirrorWindowController.positionWindowIfNeeded()` | 恢复持久化帧或按鼠标居中定位 |
 | 位置持久化 | 窗口控制器 | `MirrorWindowController.persistCurrentFrame()` | 写 `UserDefaults` 4 个 key |
@@ -225,7 +228,8 @@ UserDefaults 键（`MirrorPersistenceKey` 常量集中在 MirrorWindowController
 
 ## §6 核心业务规则与隐性约束
 
-- 【禁止】**改缩放算法时破坏「中心固定」语义** -> 缩放时 `centerInScreen` 与 `resizeAxis` 是固定参考系（`MirrorResizeState` 构造时确定，拖拽期间唯一合法变化是 `referenceSize` 与 `referenceProjectedDistance`）。若改成「以鼠标所在边为锚」的常见缩放模型，会破坏中心对齐、调换方向、且与 `persistCurrentFrame` 的位置恢复逻辑冲突（恢复逻辑假定中心不变只是尺寸变化）。**AI 易错点**：新增缩放样式时容易顺手把 `centerInScreen` 当可变量，会直接破坏现有拖拽体验。
+- 【禁止】**在 SwiftUI `onAppear` 里启动采集** -> 窗口控制器在启动时就会把宿主视图装上，此时窗口尚未 `orderFront`。`onAppear` 仍会触发，造成「摄像头指示灯亮着、镜子不在屏幕上」。采集只允许由 `showMirror()` 启动，由 `hideMirror()` 停止。
+- 【禁止】**窗口未要求出画面时因权限轮询而 `start()`** -> `recheckAuthorization()` 必须先看 `isPreviewRequested`；隐藏镜子后这条标志为 false。
 - 【禁止】拖动缩放期间执行额外 `persistCurrentFrame()` —— `beginInteractiveResize()` 之后 `windowDidMove` / `windowDidResize` 会被 `isInteractiveResizeInProgress` 抑制。**若在回调里无条件落盘，会把中间帧（拖到一半）的几何写死，导致之后打开窗口位置/尺寸错位**。
 - 【禁止】在 `resizeMirror` 内使用 `setFrame(_:display:)` 默认值 `display=true` —— 单元帧更新应 `display:false` + 依赖系统合成，否则缩放过程重绘闪烁。代码路径 `MirrorWindowController.resizeMirror` → `window.setFrame(NSRect(origin:size:), display:false)`。
 - 【隐式依赖】先判 `hasPositionedWindow` 再决定是否自动定位 —— 用户手动拖过之后（`hasPositionedWindow = true`），只有「窗口离开所有可见屏幕」或「原点为 zero」才重新自动定位；改定位逻辑时不要破坏这个「尊重用户手动摆放」语义。
@@ -233,7 +237,7 @@ UserDefaults 键（`MirrorPersistenceKey` 常量集中在 MirrorWindowController
 - 【消歧】**环形热区 vs 圆形画面**：命中是矩形边框内的一圈（含圆外四角），不是视觉圆环。App 视觉上是圆形，但交互判定按 320 见方（默认）的外缘一圈走——改交互逻辑时别按画面圆形想象热区形状。**AI 易错点**：把缩放手势接到 `clipShape(Circle())` 的视觉圆上会导致四角不可缩放、中心区域误判等。
 - 【隐式语义】`NSPanel` 的 `window.isMovableByWindowBackground = false`，拖动完全由自定义 hit-test 分发；不要依赖系统标题栏拖动（窗口是 borderless，无标题栏）。
 - 【低置信度】缩放锁掘上限 `maxSize = 520` 的演进依据未定：当多显示器 + 高分屏场景是否应该允许更大尺寸没有代码级结论（证据：`MirrorResizeState.maxSize` 常量；待确认：是否针对 Retina backing scale 放大上限）。
-- 【隐式语义】`window.orderFrontRegardless()` 与 `window.makeKeyAndOrderFront` 都调用——因为此窗口 `level = .floating`,戌 `orderFrontRegardless` 才能保证浮动层级即时显示。删除任一都会影响显示时机（**AI 易错点**：不要随手删掉 `orderFrontRegardless`）。
+- 【隐式语义】`window.orderFrontRegardless()` 与 `window.makeKeyAndOrderFront` 都调用，且必须在 `NSApp.activate` **之后的下一拍**——因为此窗口 `level = .floating`，菜单栏应用当场 orderFront 常不上屏。删除任一或改回同步调用都会再现「指示灯亮、看不见镜子」。
 
 ## §7 验证路径
 
