@@ -10,15 +10,20 @@
 		1AD7F95A83BA08E292013942 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F83C6AEEDEDBC96ACB2EA50A /* Assets.xcassets */; };
 		1CEA61764A98BE923233DD78 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85C787AFF011A304E57654E /* StatusBarController.swift */; };
 		1F52D1087DF11832349B8BAE /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */; };
+		3050E81FD5B12AA4D8AA9F21 /* MenuBarSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095A97CEEB61A5399971160B /* MenuBarSupport.swift */; };
 		350D6E0D3908E23D56C72158 /* MirrorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0246326DA58632EA987559B9 /* MirrorWindowController.swift */; };
 		4BCAABE5B90056AC2FA66E3B /* MirrorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BDA81A34E10BAA089954096 /* MirrorApp.swift */; };
+		6D97566101DD30A780A859B4 /* MacKitLifecycle in Frameworks */ = {isa = PBXBuildFile; productRef = C75383357A2C5C38C51A6488 /* MacKitLifecycle */; };
 		72D5C296EDF876AE28E7A601 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 602BFFF476991A9B6215E2AC /* Sparkle */; };
 		746DBF28E92F9C8C1A354D1F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D823A35DF15C8E2262C1DB /* AppDelegate.swift */; };
+		82CD14E064B963F393FA076C /* MacKitLaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 2335417DD19E9EFCB176AFCA /* MacKitLaunchAtLogin */; };
 		D206BA69CCFCBD821C5FC0EC /* CameraSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */; };
+		E9FA823A77FB15D6CF60776C /* MacKitCore in Frameworks */ = {isa = PBXBuildFile; productRef = 15CAF807F43F7068E3E66F71 /* MacKitCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0246326DA58632EA987559B9 /* MirrorWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorWindowController.swift; sourceTree = "<group>"; };
+		095A97CEEB61A5399971160B /* MenuBarSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarSupport.swift; sourceTree = "<group>"; };
 		1AEC7BFFF344962F26EC8458 /* Mirror.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mirror.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BDA81A34E10BAA089954096 /* MirrorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorApp.swift; sourceTree = "<group>"; };
 		4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionManager.swift; sourceTree = "<group>"; };
@@ -36,6 +41,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				72D5C296EDF876AE28E7A601 /* Sparkle in Frameworks */,
+				E9FA823A77FB15D6CF60776C /* MacKitCore in Frameworks */,
+				82CD14E064B963F393FA076C /* MacKitLaunchAtLogin in Frameworks */,
+				6D97566101DD30A780A859B4 /* MacKitLifecycle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,6 +58,7 @@
 				CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */,
 				4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */,
 				A7694174E706F8BA4FE189A3 /* Info.plist */,
+				095A97CEEB61A5399971160B /* MenuBarSupport.swift */,
 				D4E6770F8388BD9E0D219A27 /* Mirror.entitlements */,
 				2BDA81A34E10BAA089954096 /* MirrorApp.swift */,
 				0246326DA58632EA987559B9 /* MirrorWindowController.swift */,
@@ -92,6 +101,9 @@
 			name = Mirror;
 			packageProductDependencies = (
 				602BFFF476991A9B6215E2AC /* Sparkle */,
+				15CAF807F43F7068E3E66F71 /* MacKitCore */,
+				2335417DD19E9EFCB176AFCA /* MacKitLaunchAtLogin */,
+				C75383357A2C5C38C51A6488 /* MacKitLifecycle */,
 			);
 			productName = Mirror;
 			productReference = 1AEC7BFFF344962F26EC8458 /* Mirror.app */;
@@ -121,6 +133,7 @@
 			mainGroup = 60677C36157AC41ADAC5FABD;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				CB98A4945E7E73DC6CAD2F87 /* XCRemoteSwiftPackageReference "mac-kit-swift" */,
 				4A1F7A8FFA4D2D5F62AA37E1 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -152,6 +165,7 @@
 				746DBF28E92F9C8C1A354D1F /* AppDelegate.swift in Sources */,
 				1F52D1087DF11832349B8BAE /* CameraPreviewView.swift in Sources */,
 				D206BA69CCFCBD821C5FC0EC /* CameraSessionManager.swift in Sources */,
+				3050E81FD5B12AA4D8AA9F21 /* MenuBarSupport.swift in Sources */,
 				4BCAABE5B90056AC2FA66E3B /* MirrorApp.swift in Sources */,
 				350D6E0D3908E23D56C72158 /* MirrorWindowController.swift in Sources */,
 				1CEA61764A98BE923233DD78 /* StatusBarController.swift in Sources */,
@@ -235,14 +249,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.6;
+				MARKETING_VERSION = 1.0.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -319,14 +333,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.6;
+				MARKETING_VERSION = 1.0.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -364,13 +378,36 @@
 				minimumVersion = 2.9.4;
 			};
 		};
+		CB98A4945E7E73DC6CAD2F87 /* XCRemoteSwiftPackageReference "mac-kit-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/x0c/mac-kit-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		15CAF807F43F7068E3E66F71 /* MacKitCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CB98A4945E7E73DC6CAD2F87 /* XCRemoteSwiftPackageReference "mac-kit-swift" */;
+			productName = MacKitCore;
+		};
+		2335417DD19E9EFCB176AFCA /* MacKitLaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CB98A4945E7E73DC6CAD2F87 /* XCRemoteSwiftPackageReference "mac-kit-swift" */;
+			productName = MacKitLaunchAtLogin;
+		};
 		602BFFF476991A9B6215E2AC /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4A1F7A8FFA4D2D5F62AA37E1 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		C75383357A2C5C38C51A6488 /* MacKitLifecycle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CB98A4945E7E73DC6CAD2F87 /* XCRemoteSwiftPackageReference "mac-kit-swift" */;
+			productName = MacKitLifecycle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

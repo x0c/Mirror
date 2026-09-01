@@ -5,9 +5,13 @@
 Mirror 是公开自分发的 macOS 应用。每个正式版本同时交付两条完整路径：
 
 - 首次安装：公开 Release 内的 `Mirror.dmg`，使用 Developer ID 签名、苹果公证且已装订票据。
-- 后续升级：Sparkle 自动更新，公开更新仓内的 appcast 与更新包均有 Mirror 专用 EdDSA 签名；更新包内的应用也必须已经完成公证和票据装订。
+- 后续升级：Sparkle 自动更新，源码仓 Release 内的 appcast 与更新包均有 Mirror 专用 EdDSA 签名；更新包内的应用也必须已经完成公证和票据装订。
 
 应用内的更新检查自动开启；菜单栏提供「检查更新…」供用户手动触发。不要用「没有弹窗」判断没有更新，先比较本机内部构建号与公开清单。
+
+## 更新仓边界（强制）
+
+源码仓已公开，更新清单（appcast）与已签名包必须发在本仓 Release，**禁止另建 `xxx-updates` 更新仓**（全局规范与《GitHub 开源发布指南》同此要求）。2026-08-17 起已从 `x0c/Mirror-updates` 迁回本仓；旧更新仓在最终清单指向 v1.0.7 后归档，仅作为老版本包的历史下载源保留。
 
 ## 发布入口
 
@@ -20,7 +24,9 @@ Mirror 是公开自分发的 macOS 应用。每个正式版本同时交付两条
 ## 公开地址
 
 - 首装包：`https://github.com/x0c/Mirror/releases/latest/download/Mirror.dmg`
-- 更新清单：`https://github.com/x0c/Mirror-updates/releases/latest/download/appcast.xml`
+- 更新清单：`https://github.com/x0c/Mirror/releases/latest/download/appcast.xml`
+
+两者都在源码仓 Release，无独立更新仓。
 
 ## 安全与隐私边界
 

@@ -1,5 +1,6 @@
 import AppKit
-import ServiceManagement
+import MacKitCore
+import MacKitLifecycle
 import Sparkle
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -11,9 +12,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     )
     private var mirrorWindowController: MirrorWindowController?
     private var cameraPermissionObserver: NSObjectProtocol?
+    private let iconStore = MenuBarIconStore.shared
+    private let launchAtLogin = MirrorLaunchAtLogin()
+    private let terminationGuard = TerminationGuard()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        terminationGuard.isUpdateSessionInProgress = { [weak self] in
+            self?.updaterController.updater.sessionInProgress ?? false
+        }
 
         let sessionManager = CameraSessionManager()
         observeCameraReactivation(sessionManager)
@@ -22,6 +29,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         mirrorWindowController = windowController
         statusBarController = StatusBarController(
+            iconStore: iconStore,
+            launchAtLogin: launchAtLogin,
             isVisible: { [weak windowController] in
                 windowController?.isVisible ?? false
             },
@@ -37,33 +46,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             toggleMirroring: {
                 sessionManager.toggleMirroring()
             },
-            launchAtLoginStatus: {
-                SMAppService.mainApp.status
-            },
-            setLaunchAtLoginEnabled: { enabled in
-                do {
-                    switch (enabled, SMAppService.mainApp.status) {
-                    case (true, .notRegistered), (true, .notFound):
-                        try SMAppService.mainApp.register()
-                    case (false, .enabled), (false, .requiresApproval):
-                        try SMAppService.mainApp.unregister()
-                    default:
-                        break
-                    }
-                } catch {
-                    NSLog("Mirror 开机自启动设置失败：%@", error.localizedDescription)
-                }
-            },
             checkForUpdates: { [weak self] in
                 self?.updaterController.checkForUpdates(nil)
+            },
+            onQuit: { [weak self] in
+                self?.terminationGuard.requestTermination()
             }
         )
 
         windowController.showMirror()
     }
 
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
+    }
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        terminationGuard.shouldTerminate() ? .terminateNow : .terminateCancel
+    }
+
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        mirrorWindowController?.showMirror()
+        if MenuBarReopenPolicy.presentation(iconVisible: iconStore.isVisible, isReopenOrLaunch: true)
+            == .showRecoveryWindow {
+            mirrorWindowController?.showMirror()
+        } else {
+            mirrorWindowController?.showMirror()
+        }
         return true
     }
 

@@ -1,5 +1,5 @@
 import AppKit
-import ServiceManagement
+import MacKitCore
 
 @MainActor
 final class StatusBarController: NSObject, NSMenuDelegate {
@@ -10,9 +10,10 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let isVisibleHandler: () -> Bool
     private let toggleMirroringHandler: () -> Void
     private let isMirroredHandler: () -> Bool
-    private let launchAtLoginStatusHandler: () -> SMAppService.Status
-    private let setLaunchAtLoginEnabledHandler: (Bool) -> Void
+    private let launchAtLogin: MirrorLaunchAtLogin
     private let checkForUpdatesHandler: () -> Void
+    private let onQuit: () -> Void
+    private let iconStore: MenuBarIconStore
 
     private lazy var visibilityItem = NSMenuItem(
         title: "显示镜像",
@@ -34,6 +35,11 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         action: #selector(handleOpenLoginItemsSettings),
         keyEquivalent: ""
     )
+    private lazy var hideIconItem = NSMenuItem(
+        title: "隐藏菜单栏图标",
+        action: #selector(handleHideIcon),
+        keyEquivalent: ""
+    )
     private lazy var checkForUpdatesItem = NSMenuItem(
         title: "检查更新…",
         action: #selector(handleCheckForUpdates),
@@ -41,24 +47,30 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     )
 
     init(
+        iconStore: MenuBarIconStore,
+        launchAtLogin: MirrorLaunchAtLogin,
         isVisible: @escaping () -> Bool,
         toggleVisibility: @escaping () -> Void,
         showMirror: @escaping () -> Void,
         isMirrored: @escaping () -> Bool,
         toggleMirroring: @escaping () -> Void,
-        launchAtLoginStatus: @escaping () -> SMAppService.Status,
-        setLaunchAtLoginEnabled: @escaping (Bool) -> Void,
-        checkForUpdates: @escaping () -> Void
+        checkForUpdates: @escaping () -> Void,
+        onQuit: @escaping () -> Void
     ) {
+        self.iconStore = iconStore
+        self.launchAtLogin = launchAtLogin
         self.isVisibleHandler = isVisible
         self.toggleVisibilityHandler = toggleVisibility
         self.showMirrorHandler = showMirror
         self.isMirroredHandler = isMirrored
         self.toggleMirroringHandler = toggleMirroring
-        self.launchAtLoginStatusHandler = launchAtLoginStatus
-        self.setLaunchAtLoginEnabledHandler = setLaunchAtLoginEnabled
         self.checkForUpdatesHandler = checkForUpdates
+        self.onQuit = onQuit
         super.init()
+        iconStore.onChange = { [weak self] visible in
+            self?.statusItem.isVisible = visible
+        }
+        statusItem.isVisible = iconStore.isVisible
         configureButton()
         configureMenu()
     }
@@ -68,14 +80,17 @@ final class StatusBarController: NSObject, NSMenuDelegate {
             return
         }
 
-        button.image = NSImage(
-            systemSymbolName: "camera.macro.circle.fill",
-            accessibilityDescription: "Mirror"
-        )
-        button.image?.isTemplate = true
+        if let image = NSImage(named: NSImage.Name("StatusBarIcon")) {
+            image.size = NSSize(width: 18, height: 18)
+            image.isTemplate = true
+            button.image = image
+        } else {
+            NSLog("Mirror 菜单栏图标加载失败")
+        }
         button.target = self
         button.action = #selector(handleStatusItemClick(_:))
         button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        button.focusRingType = .none
     }
 
     private func configureMenu() {
@@ -83,6 +98,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         mirroringItem.target = self
         launchAtLoginItem.target = self
         approveLaunchAtLoginItem.target = self
+        hideIconItem.target = self
         checkForUpdatesItem.target = self
 
         let quitItem = NSMenuItem(
@@ -98,6 +114,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(launchAtLoginItem)
         menu.addItem(approveLaunchAtLoginItem)
+        menu.addItem(hideIconItem)
         menu.addItem(.separator())
         menu.addItem(checkForUpdatesItem)
         menu.addItem(.separator())
@@ -108,18 +125,9 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
         visibilityItem.title = isVisibleHandler() ? "隐藏镜像" : "显示镜像"
         mirroringItem.state = isMirroredHandler() ? .on : .off
-        let launchAtLoginStatus = launchAtLoginStatusHandler()
-        launchAtLoginItem.state = switch launchAtLoginStatus {
-        case .enabled:
-            .on
-        case .requiresApproval:
-            .mixed
-        case .notFound, .notRegistered:
-            .off
-        @unknown default:
-            .off
-        }
-        approveLaunchAtLoginItem.isHidden = launchAtLoginStatus != .requiresApproval
+        launchAtLogin.refresh()
+        launchAtLoginItem.state = launchAtLogin.status.menuTriState.controlState
+        approveLaunchAtLoginItem.isHidden = !launchAtLogin.status.needsApprovalMapped
     }
 
     @objc
@@ -158,16 +166,19 @@ final class StatusBarController: NSObject, NSMenuDelegate {
 
     @objc
     private func handleToggleLaunchAtLogin() {
-        let status = launchAtLoginStatusHandler()
-        setLaunchAtLoginEnabledHandler(status != .enabled && status != .requiresApproval)
+        launchAtLogin.refresh()
+        launchAtLogin.setEnabled(!launchAtLogin.status.isEffectivelyEnabled)
     }
 
     @objc
     private func handleOpenLoginItemsSettings() {
-        guard let settingsURL = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension") else {
-            return
-        }
-        NSWorkspace.shared.open(settingsURL)
+        launchAtLogin.openSystemSettings()
+    }
+
+    @objc
+    private func handleHideIcon() {
+        iconStore.isVisible = false
+        showMirrorHandler()
     }
 
     @objc
@@ -177,6 +188,20 @@ final class StatusBarController: NSObject, NSMenuDelegate {
 
     @objc
     private func handleQuit() {
-        NSApp.terminate(nil)
+        onQuit()
+    }
+}
+
+private extension LaunchAtLoginStatus {
+    var needsApprovalMapped: Bool { self == .needsApproval }
+}
+
+private extension MenuTriState {
+    var controlState: NSControl.StateValue {
+        switch self {
+        case .on: return .on
+        case .off: return .off
+        case .mixed: return .mixed
+        }
     }
 }

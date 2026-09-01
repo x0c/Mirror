@@ -15,8 +15,10 @@ SIGN_IDENTITY="Developer ID Application"
 NOTARY_KEY="${NOTARY_KEY:-${HOME}/Documents/P8 密钥/发布公证密钥/AuthKey_D7YQ9HD7D6_Notarize.p8}"
 NOTARY_KEY_ID="${NOTARY_KEY_ID:-D7YQ9HD7D6}"
 NOTARY_ISSUER="${NOTARY_ISSUER:-c98fe4b8-d1bf-4b4a-b998-9eb8f3be9fe4}"
-UPDATE_REPO="x0c/Mirror-updates"
-UPDATE_FEED_URL="https://github.com/${UPDATE_REPO}/releases/latest/download/appcast.xml"
+SOURCE_REPO="x0c/Mirror"
+UPDATE_FEED_URL="https://github.com/${SOURCE_REPO}/releases/latest/download/appcast.xml"
+# 迁移前旧更新源；仅用于首轮继承历史清单，勿在新发布里再引用
+LEGACY_FEED_URL="https://github.com/x0c/Mirror-updates/releases/latest/download/appcast.xml"
 SPARKLE_ACCOUNT="Mirror"
 LOCAL_ONLY=false
 [[ "${1:-}" == "--local-only" ]] && LOCAL_ONLY=true
@@ -49,8 +51,14 @@ zip_path="${BUILD_DIR}/Mirror-${version}.zip"
 work_dir="$(mktemp -d)"
 trap 'rm -rf "$work_dir"' EXIT
 
-if [[ "$LOCAL_ONLY" == false ]] && curl -fsSL "$UPDATE_FEED_URL" -o "$work_dir/current-appcast.xml" 2>/dev/null; then
-  published_build="$(xmllint --xpath 'string((//*[local-name()="version"] | //@*[local-name()="version"])[1])' "$work_dir/current-appcast.xml" 2>/dev/null || true)"
+published_build=""
+if [[ "$LOCAL_ONLY" == false ]]; then
+  # 优先读源码仓清单；首轮迁移时源码仓还没有清单，回退旧更新源；都不存在则视为首发
+  curl -fsSL "$UPDATE_FEED_URL" -o "$work_dir/current-appcast.xml" 2>/dev/null \
+    || curl -fsSL "$LEGACY_FEED_URL" -o "$work_dir/current-appcast.xml" 2>/dev/null || true
+  if [[ -s "$work_dir/current-appcast.xml" ]]; then
+    published_build="$(xmllint --xpath 'string((//*[local-name()="version"] | //@*[local-name()="version"])[1])' "$work_dir/current-appcast.xml" 2>/dev/null || true)"
+  fi
   [[ ! "$published_build" =~ ^[0-9]+$ || "$build_number" -ge "$published_build" ]] \
     || die "拒绝把公开更新清单回退到较低构建号"
 fi
@@ -125,39 +133,35 @@ if [[ "$LOCAL_ONLY" == true ]]; then
   exit 0
 fi
 
-step "提交源码、创建标签并发布首装包"
+step "提交源码、创建标签并发布首装包与更新清单"
 git add -A
 git commit -m "发布 Mirror ${version}" || true
 git tag -a "v${version}" -m "Mirror ${version}" 2>/dev/null || true
 git push origin main --follow-tags
-gh release create "v${version}" "$dmg_path#Mirror.dmg" --repo x0c/Mirror --title "Mirror ${version}" --notes "- 正式提供已签名并公证的 DMG 首装包。\n- 支持安全的应用内自动更新。" 2>/dev/null \
-  || gh release upload "v${version}" "$dmg_path#Mirror.dmg" --repo x0c/Mirror --clobber
 
-step "生成并发布签名更新清单"
-update_dir="$work_dir/Mirror-updates"
-git clone "https://github.com/${UPDATE_REPO}.git" "$update_dir" >/dev/null
 appcast_dir="$work_dir/appcast"
 mkdir -p "$appcast_dir"
 cp "$zip_path" "$appcast_dir/Mirror-${version}.zip"
-if [[ -f "$update_dir/appcast.xml" ]]; then cp "$update_dir/appcast.xml" "$appcast_dir/appcast.xml"; fi
+# 继承上一份清单：优先源码仓，首轮迁移回退旧更新源（历史条目的旧地址在旧仓归档后仍可匿名下载）
+curl -fsSL "$UPDATE_FEED_URL" -o "$appcast_dir/appcast-prev.xml" 2>/dev/null \
+  || curl -fsSL "$LEGACY_FEED_URL" -o "$appcast_dir/appcast-prev.xml" 2>/dev/null || true
+[[ -s "$appcast_dir/appcast-prev.xml" ]] && cp "$appcast_dir/appcast-prev.xml" "$appcast_dir/appcast.xml"
 "$sparkle_bin_dir/generate_appcast" --account "$SPARKLE_ACCOUNT" \
-  --download-url-prefix "https://github.com/${UPDATE_REPO}/releases/download/v${version}/" \
+  --download-url-prefix "https://github.com/${SOURCE_REPO}/releases/download/v${version}/" \
   --versions "$build_number" --maximum-versions 10 -o "$appcast_dir/appcast.xml" "$appcast_dir" >/dev/null
 xmllint --noout "$appcast_dir/appcast.xml"
 grep -q 'sparkle:edSignature=' "$appcast_dir/appcast.xml" || die "更新清单缺少 EdDSA 签名"
 grep -q 'sparkle-signatures:' "$appcast_dir/appcast.xml" || die "更新清单本身未签名"
-cp "$appcast_dir/appcast.xml" "$update_dir/appcast.xml"
-git -C "$update_dir" add appcast.xml
-git -C "$update_dir" commit -m "发布 Mirror ${version} 更新清单" || true
-git -C "$update_dir" push origin main
-gh release create "v${version}" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml" \
-  --repo "$UPDATE_REPO" --title "Mirror ${version} 更新" --notes "Mirror ${version} 的签名自动更新包。" 2>/dev/null \
-  || gh release upload "v${version}" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml" --repo "$UPDATE_REPO" --clobber
+# 清单、更新包、首装包全部发在同一源码仓 Release；禁止另建更新仓
+gh release create "v${version}" "$dmg_path#Mirror.dmg" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml" \
+  --repo "$SOURCE_REPO" --title "Mirror ${version}" --notes "- 正式提供已签名并公证的 DMG 首装包。\n- 支持安全的应用内自动更新。" 2>/dev/null \
+  || gh release upload "v${version}" "$dmg_path#Mirror.dmg" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml" --repo "$SOURCE_REPO" --clobber
 
 step "匿名终检公开安装包与更新清单"
-curl -fsSL "https://github.com/x0c/Mirror/releases/download/v${version}/Mirror.dmg" -o "$work_dir/anonymous.dmg"
+curl -fsSL "https://github.com/${SOURCE_REPO}/releases/download/v${version}/Mirror.dmg" -o "$work_dir/anonymous.dmg"
 curl -fsSL "$UPDATE_FEED_URL" -o "$work_dir/anonymous-appcast.xml"
 xmllint --noout "$work_dir/anonymous-appcast.xml"
-grep -q "Mirror-${version}.zip" "$work_dir/anonymous-appcast.xml" || die "公开更新清单没有当前更新包"
+grep -q "${SOURCE_REPO}/releases/download/v${version}/Mirror-${version}.zip" "$work_dir/anonymous-appcast.xml" \
+  || die "公开更新清单没有指向本仓当前更新包"
 grep -q 'sparkle:edSignature=' "$work_dir/anonymous-appcast.xml" || die "公开更新清单缺少更新签名"
 printf '\n发布完成：首装包 https://github.com/x0c/Mirror/releases/latest/download/Mirror.dmg\n更新清单 %s\n' "$UPDATE_FEED_URL"

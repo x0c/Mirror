@@ -20,7 +20,7 @@
 
 Mirror 是**菜单栏常驻应用**（`LSUIElement` 式 accessory 应用）：Dock 无图标、无菜单栏窗口，唯一的常驻入口是状态栏图标。本域负责：
 
-- 状态栏图标的创建、图标渲染与点击分发（左键 = 开关镜像窗口，右键 = 弹菜单）；
+- 状态栏图标的创建、图标渲染与点击分发（左键 = 开关镜像窗口，右键 = 弹菜单）；图标使用 App Icon 核心轮廓提炼出的黑色透明线稿模板图，不直接缩小彩色 App Icon；
 - 菜单内容与状态同步：「显示 / 隐藏镜像」「水平镜像」勾选、「退出」；
 - 应用启动装配（`@NSApplicationDelegateAdaptor` → `AppDelegate`）与激活策略（accessory 模式）；
 - 应用生命周期观察：从系统设置返回（`didBecomeActive`）时自动重检摄像头权限。
@@ -46,7 +46,7 @@ graph TD
     D --> E[observeCameraReactivation<br/>didBecomeActive→重检权限]
     B --> F[MirrorWindowController<br/>init sessionManager]
     F --> G[StatusBarController<br/>注入 4 个闭包]
-    G --> H[statusItem.button<br/>camera.macro.circle.fill 图标]
+    G --> H[statusItem.button<br/>App Icon 同款黑白透明线稿模板图]
     H -->|左键 rightMouseUp| I[openMirrorIfNeeded→toggleVisibilityHandler]
     H -->|右键或菜单弹出| J[menu.popUp 从 button 下方]
     J --> K[菜单项: 显示/隐藏镜像 toggleVisibilityHandler]
@@ -166,6 +166,7 @@ stateDiagram-v2
 ## §6 核心业务逻辑与隐性约束
 
 - 【禁止】**在非主线程访问菜单栏 / 状态栏项** -> 所有 UI 更新（标题、勾选、状态查询回调）必须发生在事件循环（主线程）；`NSMenuItem` 与 `NSStatusItem` 不是线程安全的。代码中 `isVisibleHandler` / `isMirroredHandler` 回调发生在主线程菜单路径，不需额外加锁，**不要**把菜单刷新逻辑放到后台线程。
+- 【固定视觉规则】**菜单栏图标沿用 App Icon 的核心语义，但必须是独立的黑白透明模板图**：保留原 App Icon 的两张斜纸层、前层纸张边框、内页区域和三角形斜线之间的几何关系，不能用普通矩形和缺少一边的折线替代原图形；前层主体以足够厚的轮廓线表达，原图中的后层纸和投影可以用纯黑块面表达，不要求所有细节都描成线，避免 18×18 线条过密；尤其是斜三角内部和右下后层/投影等容易挤成密线的区域，直接使用纯黑填充，不使用灰阶或半透明阴影。删除黄色背景、纹理和高光。线条要有足够的视觉重量，禁止为了追求留白使用极细线；实际视觉重量不得明显低于同尺寸 Apple 系统菜单栏符号，校准时以 macOS 自带符号在相同尺寸下的观感为参照。Apple 官方没有给自定义菜单栏图标规定一个固定像素线宽，验收依据是与系统符号保持一致的 optical weight；小尺寸应通过减少线条数量和内部细节来留白，而不是把保留的线继续变细。本轮以 macOS 18 pt 的 SF Symbol `doc.on.doc` 在 `medium` 到 `semibold` 重量之间作为视觉参照。非透明像素 RGB 必须为纯黑，层次只能用透明区域与必要的抗锯齿 alpha 表达，并通过 Asset Catalog 的 `template` 渲染意图交给系统在浅色 / 深色菜单栏中着色。18×18 显示时应先看到清楚的纸张轮廓、后层关系、纯黑斜三角和透明留白，而不是一整块黑色。禁止把完整彩色 App Icon 等比缩小、机械灰度化或阈值填黑。
 - 【禁止】**挂 statusItem.menu 属性**——菜单通过 `menu.popUp` 手动弹出，`statusItem.button.menu` **从未被赋值**（设置按钮 `target`/`action` 后手动分发）。若把 `statusItem.menu = menu` 这样的 Api 加回，状态栏图标会变成「点击弹菜单」而不是「左键即开镜像」——这违反本应用「左键直达开关」的核心语义（见注释块）。**AI 易错点**：习惯性把 `statusItem.menu` 赋值是常见回退，必须保持 `popUp` 手动分发方式。
 - 【禁止】**手写 `CameraAuthorization` 逻辑到菜单域** -> 权限检查/重检统一在 `CameraSessionManager`，菜单只读 `isMirrored` 与切换回调。避免在菜单代码里直接引用 `AVCaptureDevice`。**AI 易错点**：在菜单项 action 里做权限判断极易造成状态不一致（菜单只做状态查询转发）。
 - 【隐式依赖】**`didBecomeActive` 与重检的串行关系**：`observeCameraReactivation` 的回调包裹 `Task { @MainActor }`，即每次 `didBecomeActive` 都会 `recheckAuthorization()`，而权限状态从 `unauthorized` → 恢复必须经过这个入口。**如果新增「恢复」路径（如菜单项手动重检），必须走 `recheckAuthorization()` 而不是直接 `start()`**（start 在 unauthorized 态直接返回，见采集 KB）。
@@ -177,7 +178,7 @@ stateDiagram-v2
 ## §7 常见易忽略条件与验证路径
 
 - 改菜单栏后：重启应用（`pkill -x Mirror || true` → 启动），检查：
-  - 状态栏图标正常出现（`camera.macro.circle.fill` 模板图标）；
+  - 状态栏图标正常出现（App Icon 同款黑白透明模板图）；浅色 / 深色菜单栏均能清晰辨认，且不显示黄色底、阴影或灰色脏边；
   - **左键**单击图标 → 镜像窗立即显示/隐藏（而不是弹菜单）；
   - **右键**单击 → 菜单弹出；标题为「隐藏镜像」时表示当前可见，勾选框与「水平镜像」开关一致。
 - 权限恢复链路（联动采集域 §7）：
@@ -195,6 +196,7 @@ stateDiagram-v2
 
 - `CAMERA_SESSION_KNOWLEDGE_BASE.md`：菜单项「水平镜像」与权限状态机的联动（`CameraSessionManager.toggleMirroring` / `recheckAuthorization` 行为、`unauthorized` 态的 start 短路）。
 - `MIRROR_WINDOW_KNOWLEDGE_BASE.md`：`toggle()` 与 `hideMirror()` 的窗口行为、窗口持久化交互见窗口 KB；菜单与窗口的「isVisible 为准」约定在两侧共同。
+- [Apple Human Interface Guidelines — Icons](https://developer.apple.com/design/human-interface-guidelines/icons)：菜单栏模板图按“高度简化、黑色与透明定义形状、避免极细线”的官方原则制作；小尺寸应删减细节，不以继续减细线宽换留白。
 
 ## §9 覆盖度与待补充项
 

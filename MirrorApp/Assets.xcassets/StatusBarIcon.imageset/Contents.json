@@ -1,0 +1,21 @@
+{
+  "images": [
+    {
+      "filename": "StatusBarIcon-18.png",
+      "idiom": "mac",
+      "scale": "1x"
+    },
+    {
+      "filename": "StatusBarIcon-36@2x.png",
+      "idiom": "mac",
+      "scale": "2x"
+    }
+  ],
+  "info": {
+    "author": "com.x0c.mirror",
+    "version": 1
+  },
+  "properties": {
+    "template-rendering-intent": "template"
+  }
+}

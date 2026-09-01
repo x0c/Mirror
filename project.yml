@@ -30,6 +30,9 @@ packages:
   Sparkle:
     url: https://github.com/sparkle-project/Sparkle
     from: "2.9.4"
+  MacKit:
+    url: https://github.com/x0c/mac-kit-swift
+    from: "0.1.0"
 
 targets:
   Mirror:
@@ -43,8 +46,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.x0c.mirror
         INFOPLIST_FILE: MirrorApp/Info.plist
         CODE_SIGN_ENTITLEMENTS: MirrorApp/Mirror.entitlements
-        MARKETING_VERSION: "1.0.6"
-        CURRENT_PROJECT_VERSION: "7"
+        MARKETING_VERSION: "1.0.8"
+        CURRENT_PROJECT_VERSION: "9"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:
       path: MirrorApp/Info.plist
@@ -55,7 +58,7 @@ targets:
         LSUIElement: true
         NSCameraUsageDescription: 需要访问前置摄像头来显示镜子画面。
         NSHumanReadableCopyright: "Copyright © 2026 x0c"
-        SUFeedURL: "https://github.com/x0c/Mirror-updates/releases/latest/download/appcast.xml"
+        SUFeedURL: "https://github.com/x0c/Mirror/releases/latest/download/appcast.xml"
         SUEnableAutomaticChecks: true
         SUAutomaticallyUpdate: true
         SURequireSignedFeed: true
@@ -64,3 +67,9 @@ targets:
     dependencies:
       - package: Sparkle
         product: Sparkle
+      - package: MacKit
+        product: MacKitCore
+      - package: MacKit
+        product: MacKitLaunchAtLogin
+      - package: MacKit
+        product: MacKitLifecycle
