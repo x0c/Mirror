@@ -152,14 +152,27 @@ curl -fsSL "$UPDATE_FEED_URL" -o "$appcast_dir/appcast-prev.xml" 2>/dev/null \
 xmllint --noout "$appcast_dir/appcast.xml"
 grep -q 'sparkle:edSignature=' "$appcast_dir/appcast.xml" || die "更新清单缺少 EdDSA 签名"
 grep -q 'sparkle-signatures:' "$appcast_dir/appcast.xml" || die "更新清单本身未签名"
-# 清单、更新包、首装包全部发在同一源码仓 Release；禁止另建更新仓
-gh release create "v${version}" "$dmg_path#Mirror.dmg" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml" \
-  --repo "$SOURCE_REPO" --title "Mirror ${version}" --notes "- 正式提供已签名并公证的 DMG 首装包。\n- 支持安全的应用内自动更新。" 2>/dev/null \
-  || gh release upload "v${version}" "$dmg_path#Mirror.dmg" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml" --repo "$SOURCE_REPO" --clobber
+# 清单、更新包、首装包全部发在同一源码仓 Release；禁止另建更新仓。
+# 创建发行页不要夹带安装包（uploads.github.com 会 404）；先建空页再逐个上传。
+if ! gh release view "v${version}" --repo "$SOURCE_REPO" >/dev/null 2>&1; then
+  gh release create "v${version}" --repo "$SOURCE_REPO" --title "Mirror ${version}" \
+    --notes "- 正式提供已签名并公证的 DMG 首装包。"$'\n'"- 支持安全的应用内自动更新。"
+fi
+for asset_path in "$dmg_path#Mirror.dmg" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml"; do
+  gh release upload "v${version}" "$asset_path" --repo "$SOURCE_REPO" --clobber
+done
 
 step "匿名终检公开安装包与更新清单"
-curl -fsSL "https://github.com/${SOURCE_REPO}/releases/download/v${version}/Mirror.dmg" -o "$work_dir/anonymous.dmg"
-curl -fsSL "$UPDATE_FEED_URL" -o "$work_dir/anonymous-appcast.xml"
+anonymous_ok=0
+for _try in 1 2 3 4 5 6; do
+  if curl -fsSL "https://github.com/${SOURCE_REPO}/releases/download/v${version}/Mirror.dmg" -o "$work_dir/anonymous.dmg" \
+    && curl -fsSL "$UPDATE_FEED_URL" -o "$work_dir/anonymous-appcast.xml"; then
+    anonymous_ok=1
+    break
+  fi
+  sleep 5
+done
+[[ "$anonymous_ok" -eq 1 ]] || die "公开发行页附件尚未可匿名下载"
 xmllint --noout "$work_dir/anonymous-appcast.xml"
 grep -q "${SOURCE_REPO}/releases/download/v${version}/Mirror-${version}.zip" "$work_dir/anonymous-appcast.xml" \
   || die "公开更新清单没有指向本仓当前更新包"
