@@ -273,4 +273,4 @@ UserDefaults 键（`MirrorPersistenceKey` 常量集中在 MirrorWindowController
 - Q&A 补充：0 条（未执行人机问答）。
 - 待补充：缩放上限 520 是否对大屏 Retina 场景足够（用户决策）；`NSScreen.screens` 首屏命名顺序在多显示器下的行为（代码用 `first(where:)` + `NSScreen.main` 兜底，未做 post-key 校验）；无自动化测试覆盖手势路径。
 
-<!-- 该文档由 doc-init 生成于 2026-08-08；定位：AI 修改本业务域前的快速参考文档 -->
+<!-- 该文档整理/压缩于 2026-09-05 -->
