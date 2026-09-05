@@ -22,7 +22,7 @@ Mirror 是**菜单栏常驻应用**（`LSUIElement` 式 accessory 应用）：Do
 
 - 状态栏图标的创建、图标渲染与点击分发（左键 = 开关镜像窗口，右键 = 弹菜单）；图标使用 App Icon 核心轮廓提炼出的黑色透明线稿模板图，不直接缩小彩色 App Icon；
 - 菜单内容与状态同步：「显示 / 隐藏镜像」「水平镜像」勾选、开机自启、检查更新、「退出」；
-- **登录项静默启动**：登录拉起时只就绪状态栏与会话，**不**自动 `showMirror()`；用户主动冷启动仍打开就看到镜子；
+- **启动只就绪**：冷启动与登录项拉起时只就绪状态栏与会话对象，**禁止**自动 `showMirror()` / 开摄像头；
 - **禁止隐藏菜单栏图标**：菜单与镜像窗均不提供隐藏/恢复图标入口；启动时强制图标可见；
 - 应用启动装配（`@NSApplicationDelegateAdaptor` → `AppDelegate`）与激活策略（accessory 模式）；
 - 应用生命周期观察：从系统设置返回（`didBecomeActive`）时自动重检摄像头权限。
@@ -33,9 +33,8 @@ Mirror 是**菜单栏常驻应用**（`LSUIElement` 式 accessory 应用）：Do
 - **菜单栏菜单**（`NSMenu`）：显示/隐藏镜像（标题动态）、水平镜像（勾选态）、开机自启、检查更新、退出 Mirror。**不得**含「隐藏菜单栏图标」。
 - **边界控制器**（`AppDelegate`）：应用入口，装配三个依赖（会话、窗口、菜单），并监听权限。状态栏与窗口、会话完全解耦（用闭包注入，见 §3）。
 - **accessory 激活策略**：`NSApp.setActivationPolicy(.accessory)`，Dock 无图标、点窗口可激活但无常规菜单栏应用行为。
-- **登录静默判定**（`LoginLaunchDetector.isLaunchedAsLoginItem`，MacKitLifecycle）：须在 `applicationDidFinishLaunching` 早期读取。
 
-核心循环：用户在状态栏图标上**左键单击** → 若窗口不可见则 `toggleVisibilityHandler()`（即「显示镜像」）；**右键单击** → 弹出菜单（含标题与勾选状态）；窗口内双击同样回到隐藏。任何「显示镜像」动作本质上由窗口控制器落盘位置、启动采集会话（见采集域）。
+核心循环：用户在状态栏图标上**左键单击** → `showMirror()`（开窗并开采集）；**右键单击** → 弹出菜单；窗口内双击隐藏并停采集。
 
 ## §1.5 架构概览
 
@@ -75,14 +74,13 @@ stateDiagram-v2
 
 ### 2.1 启动装配流程（`AppDelegate.applicationDidFinishLaunching`）
 
-1. **尽早**读取 `LoginLaunchDetector.isLaunchedAsLoginItem`（Apple Event 稍后可能清空）。
-2. `NSApp.setActivationPolicy(.accessory)` —— 关键：**必须在任何窗口展示前**设置，否则 Dock 图标与菜单栏应用方式不对（见 §6）。
-3. 若 `MenuBarIconStore.isVisible == false`，写回 `true`（图标即唯一入口，禁止保持隐藏偏好）。
-4. `CameraSessionManager()` 创建会话管理器（唯一实例，之后通过闭包共享）。
-5. `observeCameraReactivation(sessionManager)`：注册 `NSApplication.didBecomeActiveNotification` 观察者，队列 `.main`，回调里 `Task { @MainActor sessionManager?.recheckAuthorization() }`（弱引用防泄漏，见 §6）。
-6. `MirrorWindowController.init(sessionManager:)` 创建窗口控制器（此时不显示、也不得启动采集）。
-7. `StatusBarController.init(...)`：注入闭包而非直接持对象引用，包括 `isVisible`、`toggleVisibility`（菜单显隐）、`showMirror`（左键/启动上屏）、镜像与开机启动、检查更新。状态项强制 `isVisible = true`。
-8. **仅当非登录拉起**时调用 `windowController.showMirror()` —— 用户主动打开就要看到镜子；登录项拉起必须静默（零窗口）。
+1. `NSApp.setActivationPolicy(.accessory)` —— 关键：**必须在任何窗口展示前**设置，否则 Dock 图标与菜单栏应用方式不对（见 §6）。
+2. 若 `MenuBarIconStore.isVisible == false`，写回 `true`（图标即唯一入口，禁止保持隐藏偏好）。
+3. `CameraSessionManager()` 创建会话管理器（唯一实例，之后通过闭包共享）。**此时不得 `start()`。**
+4. `observeCameraReactivation(sessionManager)`：注册 `NSApplication.didBecomeActiveNotification` 观察者，队列 `.main`，回调里 `Task { @MainActor sessionManager?.recheckAuthorization() }`（弱引用防泄漏，见 §6）。
+5. `MirrorWindowController.init(sessionManager:)` 创建窗口控制器（此时不显示、也不得启动采集）。
+6. `StatusBarController.init(...)`：注入闭包；状态项强制 `isVisible = true`。
+7. **到此结束。禁止在装配末尾调用 `showMirror()`。** 冷启动与登录项行为相同：只出现菜单栏图标，摄像头指示灯保持熄灭。
 
 装配顺序即创建顺序；无显式依赖管理，全在 AppDelegate 方法内完成（本域规模小，不需要解耦容器）。
 
@@ -174,7 +172,7 @@ stateDiagram-v2
 
 ## §6 核心业务逻辑与隐性约束
 
-- 【产品裁定 · 登录静默】**登录项拉起禁止 `showMirror()` / 打开设置类窗口**。判定只用 `LoginLaunchDetector.isLaunchedAsLoginItem`，不要用「是否登记了登录项」代替。用户主动冷启动与 reopen 仍可出示镜子。
+- 【产品裁定 · 启动只就绪】**冷启动与登录项一律禁止自动 `showMirror()` / 开摄像头**。装配结束只留菜单栏图标；摄像头指示灯不得无人操作时亮起。仅左键、菜单「显示镜像」、reopen 才开镜子。
 - 【产品裁定 · 图标常驻】**图标即唯一主入口 → 禁止隐藏菜单栏图标**。不得在菜单或设置/恢复面提供 Hide / Show Menu Bar Icon；启动时强制 `statusItem.isVisible = true`，若偏好曾为 false 写回 true。
 - 【禁止】**在非主线程访问菜单栏 / 状态栏项** -> 所有 UI 更新（标题、勾选、状态查询回调）必须发生在事件循环（主线程）；`NSMenuItem` 与 `NSStatusItem` 不是线程安全的。代码中 `isVisibleHandler` / `isMirroredHandler` 回调发生在主线程菜单路径，不需额外加锁，**不要**把菜单刷新逻辑放到后台线程。
 - 【固定视觉规则】**菜单栏图标沿用 App Icon 的核心语义，但必须是独立的黑白透明模板图**：保留原 App Icon 的两张斜纸层、前层纸张边框、内页区域和三角形斜线之间的几何关系，不能用普通矩形和缺少一边的折线替代原图形；前层主体以足够厚的轮廓线表达，原图中的后层纸和投影可以用纯黑块面表达，不要求所有细节都描成线，避免 18×18 线条过密；尤其是斜三角内部和右下后层/投影等容易挤成密线的区域，直接使用纯黑填充，不使用灰阶或半透明阴影。删除黄色背景、纹理和高光。线条要有足够的视觉重量，禁止为了追求留白使用极细线；实际视觉重量不得明显低于同尺寸 Apple 系统菜单栏符号，校准时以 macOS 自带符号在相同尺寸下的观感为参照。Apple 官方没有给自定义菜单栏图标规定一个固定像素线宽，验收依据是与系统符号保持一致的 optical weight；小尺寸应通过减少线条数量和内部细节来留白，而不是把保留的线继续变细。本轮以 macOS 18 pt 的 SF Symbol `doc.on.doc` 在 `medium` 到 `semibold` 重量之间作为视觉参照。非透明像素 RGB 必须为纯黑，层次只能用透明区域与必要的抗锯齿 alpha 表达，并通过 Asset Catalog 的 `template` 渲染意图交给系统在浅色 / 深色菜单栏中着色。18×18 显示时应先看到清楚的纸张轮廓、后层关系、纯黑斜三角和透明留白，而不是一整块黑色。禁止把完整彩色 App Icon 等比缩小、机械灰度化或阈值填黑。
@@ -192,7 +190,7 @@ stateDiagram-v2
   - 状态栏图标正常出现（App Icon 同款黑白透明模板图）；浅色 / 深色菜单栏均能清晰辨认，且不显示黄色底、阴影或灰色脏边；
   - **左键**单击图标 → 镜像窗立即显示/隐藏（而不是弹菜单）；
   - **右键**单击 → 菜单弹出；标题为「隐藏镜像」时表示当前可见，勾选框与「水平镜像」开关一致；**菜单无「隐藏菜单栏图标」**。
-  - 用户主动冷启动：镜像窗自动出现；登录项拉起（重新登录真机）：仅状态栏就绪、无镜像窗（可标未测若未重登）。
+  - **冷启动 / 登录项拉起**：仅状态栏就绪，无镜像窗、摄像头指示灯不亮；左键后再开窗开采集。
 - 权限恢复链路（联动采集域 §7）：
   ```bash
   tccutil reset Camera com.x0c.mirror    # 重置权限

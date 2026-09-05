@@ -46,7 +46,8 @@
 ```mermaid
 graph TD
     A[StatusBarController<br/>左键点击] -->|showMirror| B[MirrorWindowController.showMirror]
-    C[非登录冷启动 / 再次打开应用] -->|showMirror| B
+    C[再次打开应用 reopen] -->|showMirror| B
+    D[菜单栏左键 / 菜单显示镜像] -->|showMirror| B
     B -->|positionWindowIfNeeded| D[恢复持久化帧或<br/>鼠标处居中定位]
     B -->|sessionManager.start| E[采集会话<br/>CameraSessionManager]
     B -->|activate 后下一拍<br/>makeKeyAndOrderFront + orderFrontRegardless| F[MirrorPanel 显示]
@@ -64,7 +65,7 @@ graph TD
 ```mermaid
 stateDiagram-v2
     [*] --> hidden: 应用启动
-    hidden --> visible: showMirror()（启动、左键、再次打开应用；恢复/定位帧 + start + 下一拍 orderFrontRegardless）
+    hidden --> visible: showMirror()（左键、菜单显示、再次打开应用；恢复/定位帧 + start + 下一拍 orderFrontRegardless）
     visible --> hidden: hideMirror()（双击 / 菜单「隐藏镜像」；持久化 + stop + orderOut）
     visible --> visible: 拖拽移动 / 外环缩放 / 滚轮调透明度（每次变化即持久化）
 ```
@@ -98,7 +99,7 @@ stateDiagram-v2
 3. `NSApp.activate(ignoringOtherApps: true)`：把应用拉到前台（无 Dock 图标的 accessory 应用必须主动激活）。
 4. **下一个 runloop** 再 `window.makeKeyAndOrderFront(nil)` + `window.orderFrontRegardless()`：菜单栏应用必须错开一拍，否则窗口会排到别的应用后面甚至不上屏。
 
-启动装配在非登录冷启动结束、菜单栏左键、以及再次打开应用（`applicationShouldHandleReopen`）都走 `showMirror()`，不走 `toggle()`。`toggle()` 只给菜单「显示/隐藏镜像」。登录项拉起不调用 `showMirror()`（见菜单栏入口 KB）。
+菜单栏左键、菜单「显示镜像」、以及再次打开应用（`applicationShouldHandleReopen`）才走 `showMirror()`，不走 `toggle()`。`toggle()` 只给菜单「显示/隐藏镜像」。**冷启动与登录项装配结束时禁止调用 `showMirror()`**（见菜单栏入口 KB「启动只就绪」）。
 
 ### 2.3 隐藏流程（`hideMirror()`）
 
@@ -187,7 +188,7 @@ stateDiagram-v2
 |---|---|---|---|
 | 窗口创建与展示 | 窗口控制器 | `MirrorWindowController.init(sessionManager:)` | 构建 `MirrorPanel`、`DraggableHostingView`、`MirrorContentView` |
 | 显示/隐藏切换 | 窗口控制器 | `MirrorWindowController.toggle()` | 仅菜单「显示/隐藏镜像」 |
-| 显示镜子 | 窗口控制器 | `MirrorWindowController.showMirror()` | 启动、左键、再次打开应用；先定位再开采集再上屏 |
+| 显示镜子 | 窗口控制器 | `MirrorWindowController.showMirror()` | 左键、菜单显示、再次打开应用；先定位再开采集再上屏；**禁止**冷启动自动调用 |
 | 隐藏窗口 | 窗口控制器 | `MirrorWindowController.hideMirror()` | 双击 / 菜单「隐藏窗口」调用 |
 | 定位窗口 | 窗口控制器 | `MirrorWindowController.positionWindowIfNeeded()` | 恢复持久化帧或按鼠标居中定位 |
 | 位置持久化 | 窗口控制器 | `MirrorWindowController.persistCurrentFrame()` | 写 `UserDefaults` 4 个 key |

@@ -17,9 +17,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let terminationGuard = TerminationGuard()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // 须在启动早期读取：currentAppleEvent 稍后可能已清空。
-        let isLoginLaunch = LoginLaunchDetector.isLaunchedAsLoginItem
-
         NSApp.setActivationPolicy(.accessory)
         terminationGuard.isUpdateSessionInProgress = { [weak self] in
             self?.updaterController.updater.sessionInProgress ?? false
@@ -62,10 +59,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         )
 
-        // 登录项拉起必须静默；用户主动冷启动仍「打开就看到镜子」。
-        if !isLoginLaunch {
-            windowController.showMirror()
-        }
+        // 冷启动与登录项一律只就绪菜单栏；禁止自动开镜子/摄像头。
+        // 仅用户左键、菜单「显示镜像」、或 applicationShouldHandleReopen 才 showMirror()。
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

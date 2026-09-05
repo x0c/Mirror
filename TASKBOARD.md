@@ -4,4 +4,4 @@
 
 | 任务 | 状态 | 影响范围 | 开始 | 最近更新 | 备注 |
 |---|---|---|---|---|---|
-| 登录静默 + 禁止隐藏菜单栏图标 + MacKit 0.1.2 | in_progress | AppDelegate, StatusBarController, MenuBar docs, Package.resolved, version | 2026-09-05 | 2026-09-05 | Auto subagent |
+| 启动禁止自动开摄像头 | 进行中 | AppDelegate、菜单栏/窗口/采集 KB、版本 | 21:22 | 2026-09-05 21:22 | 产品意图已写入 AGENTS |

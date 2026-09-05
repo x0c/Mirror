@@ -41,7 +41,7 @@ Mirror 的核心数据来源：通过 AVFoundation 的采集会话（AVCaptureSe
 
 ```mermaid
 graph TD
-    A[StatusBarController<br/>菜单栏左键 / 启动] -->|showMirror| B[MirrorWindowController.showMirror]
+    A[StatusBarController<br/>菜单栏左键 / 菜单显示] -->|showMirror| B[MirrorWindowController.showMirror]
     B -->|sessionManager.start| D[CameraSessionManager.start]
     D -->|prepareIfNeeded| E[摄像头权限检查/请求]
     E -->|authorized| F[configureSessionIfNeeded<br/>withCheckedThrowingContinuation]
@@ -132,7 +132,7 @@ stateDiagram-v2
 
 | 场景 | 入口 | 类/方法/配置 | 说明 |
 |---|---|---|---|
-| 打开镜像触发采集 | 窗口控制器 | `MirrorWindowController.showMirror()` | 显示窗口前调 `sessionManager.start()`；启动/左键/再次打开都走这里 |
+| 打开镜像触发采集 | 窗口控制器 | `MirrorWindowController.showMirror()` | 显示窗口前调 `sessionManager.start()`；仅左键 / 菜单显示 / reopen；**禁止**在启动装配里调用 |
 | 隐藏镜像停止采集 | 窗口控制器 | `MirrorWindowController.hideMirror()` | 持久化窗口帧后调 `sessionManager.stop()` |
 | 采集启动 | 会话管理器 | `CameraSessionManager.start()` | 见 §2 启动主流程 |
 | 采集停止 | 会话管理器 | `CameraSessionManager.stop()` | 见 §2 停止流程 |
