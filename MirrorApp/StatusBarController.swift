@@ -35,11 +35,6 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         action: #selector(handleOpenLoginItemsSettings),
         keyEquivalent: ""
     )
-    private lazy var hideIconItem = NSMenuItem(
-        title: "隐藏菜单栏图标",
-        action: #selector(handleHideIcon),
-        keyEquivalent: ""
-    )
     private lazy var checkForUpdatesItem = NSMenuItem(
         title: "检查更新…",
         action: #selector(handleCheckForUpdates),
@@ -70,7 +65,8 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         iconStore.onChange = { [weak self] visible in
             self?.statusItem.isVisible = visible
         }
-        statusItem.isVisible = iconStore.isVisible
+        // 图标即唯一主入口：启动时强制可见，不对外提供隐藏。
+        statusItem.isVisible = true
         configureButton()
         configureMenu()
     }
@@ -98,7 +94,6 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         mirroringItem.target = self
         launchAtLoginItem.target = self
         approveLaunchAtLoginItem.target = self
-        hideIconItem.target = self
         checkForUpdatesItem.target = self
 
         let quitItem = NSMenuItem(
@@ -114,7 +109,6 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(launchAtLoginItem)
         menu.addItem(approveLaunchAtLoginItem)
-        menu.addItem(hideIconItem)
         menu.addItem(.separator())
         menu.addItem(checkForUpdatesItem)
         menu.addItem(.separator())
@@ -173,12 +167,6 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     @objc
     private func handleOpenLoginItemsSettings() {
         launchAtLogin.openSystemSettings()
-    }
-
-    @objc
-    private func handleHideIcon() {
-        iconStore.isVisible = false
-        showMirrorHandler()
     }
 
     @objc

@@ -17,9 +17,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let terminationGuard = TerminationGuard()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // 须在启动早期读取：currentAppleEvent 稍后可能已清空。
+        let isLoginLaunch = LoginLaunchDetector.isLaunchedAsLoginItem
+
         NSApp.setActivationPolicy(.accessory)
         terminationGuard.isUpdateSessionInProgress = { [weak self] in
             self?.updaterController.updater.sessionInProgress ?? false
+        }
+
+        // 图标即唯一主入口：禁止隐藏；若用户以前藏过，写回可见。
+        if !iconStore.isVisible {
+            iconStore.isVisible = true
         }
 
         let sessionManager = CameraSessionManager()
@@ -54,7 +62,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         )
 
-        windowController.showMirror()
+        // 登录项拉起必须静默；用户主动冷启动仍「打开就看到镜子」。
+        if !isLoginLaunch {
+            windowController.showMirror()
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -66,12 +77,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if MenuBarReopenPolicy.presentation(iconVisible: iconStore.isVisible, isReopenOrLaunch: true)
-            == .showRecoveryWindow {
-            mirrorWindowController?.showMirror()
-        } else {
-            mirrorWindowController?.showMirror()
-        }
+        // reopen 不是登录拉起；图标始终可见时策略为 .none，仍出示镜子（产品：再次打开即见镜像）。
+        _ = MenuBarReopenPolicy.presentation(
+            iconVisible: iconStore.isVisible,
+            isReopenOrLaunch: true,
+            isLoginLaunch: false
+        )
+        mirrorWindowController?.showMirror()
         return true
     }
 

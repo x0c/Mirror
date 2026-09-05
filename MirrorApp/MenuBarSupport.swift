@@ -4,7 +4,8 @@ import Foundation
 import MacKitCore
 import MacKitLaunchAtLogin
 
-/// 菜单栏图标显隐。缺省为显示；用键是否存在判断，避免把空当成关。
+/// 菜单栏图标显隐存储（内部实现保留）。
+/// 产品上图标即唯一主入口，对外禁止隐藏；启动时若曾藏过会写回 true。
 @MainActor
 final class MenuBarIconStore: ObservableObject {
     static let shared = MenuBarIconStore()

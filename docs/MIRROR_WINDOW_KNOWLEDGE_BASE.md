@@ -46,7 +46,7 @@
 ```mermaid
 graph TD
     A[StatusBarController<br/>左键点击] -->|showMirror| B[MirrorWindowController.showMirror]
-    C[启动完成 / 再次打开应用] -->|showMirror| B
+    C[非登录冷启动 / 再次打开应用] -->|showMirror| B
     B -->|positionWindowIfNeeded| D[恢复持久化帧或<br/>鼠标处居中定位]
     B -->|sessionManager.start| E[采集会话<br/>CameraSessionManager]
     B -->|activate 后下一拍<br/>makeKeyAndOrderFront + orderFrontRegardless| F[MirrorPanel 显示]
@@ -98,7 +98,7 @@ stateDiagram-v2
 3. `NSApp.activate(ignoringOtherApps: true)`：把应用拉到前台（无 Dock 图标的 accessory 应用必须主动激活）。
 4. **下一个 runloop** 再 `window.makeKeyAndOrderFront(nil)` + `window.orderFrontRegardless()`：菜单栏应用必须错开一拍，否则窗口会排到别的应用后面甚至不上屏。
 
-启动装配结束、菜单栏左键、以及再次打开应用（`applicationShouldHandleReopen`）都走 `showMirror()`，不走 `toggle()`。`toggle()` 只给菜单「显示/隐藏镜像」。
+启动装配在非登录冷启动结束、菜单栏左键、以及再次打开应用（`applicationShouldHandleReopen`）都走 `showMirror()`，不走 `toggle()`。`toggle()` 只给菜单「显示/隐藏镜像」。登录项拉起不调用 `showMirror()`（见菜单栏入口 KB）。
 
 ### 2.3 隐藏流程（`hideMirror()`）
 

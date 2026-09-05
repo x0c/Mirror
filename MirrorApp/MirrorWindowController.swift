@@ -300,33 +300,14 @@ private final class DraggableHostingView<Content: View>: NSHostingView<Content> 
 
 private struct MirrorContentView: View {
     let sessionManager: CameraSessionManager
-    @ObservedObject private var iconStore = MenuBarIconStore.shared
 
     var body: some View {
         GeometryReader { proxy in
-            ZStack {
-                content
-                if !iconStore.isVisible {
-                    VStack {
-                        Spacer()
-                        Button("显示菜单栏图标") {
-                            iconStore.isVisible = true
-                        }
-                        .buttonStyle(.plain)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Color.black.opacity(0.55), in: Capsule())
-                        .padding(.bottom, 18)
-                        .focusEffectDisabled()
-                    }
-                }
-            }
-            .frame(width: proxy.size.width, height: proxy.size.height)
-            .background(Color.clear)
-            .clipShape(Circle())
-            .contentShape(Circle())
+            content
+                .frame(width: proxy.size.width, height: proxy.size.height)
+                .background(Color.clear)
+                .clipShape(Circle())
+                .contentShape(Circle())
         }
     }
 
