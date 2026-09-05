@@ -85,45 +85,20 @@ final class PreviewHostingView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
-        if event.clickCount == 2 {
-            (window?.windowController as? MirrorWindowController)?.hideMirror()
-            return
-        }
-
-        if let state = makeResizeStateIfNeeded(with: event) {
-            resizeState = state
-            (window?.windowController as? MirrorWindowController)?.beginInteractiveResize()
-            (window as? MirrorPanel)?.activeResizeCursor = state.cursor
-            syncResizeCursor(state.cursor)
-            return
-        }
-
-        window?.performDrag(with: event)
+        MirrorWindowGestures.mouseDown(with: event, in: self, resizeState: &resizeState)
     }
 
     override func mouseDragged(with event: NSEvent) {
-        guard var resizeState, let window else {
-            return
-        }
-
-        syncResizeCursor(resizeState.cursor)
-        window.resizeMirror(using: event, state: &resizeState)
-        self.resizeState = resizeState
+        MirrorWindowGestures.mouseDragged(with: event, in: self, resizeState: &resizeState)
     }
 
     override func mouseUp(with event: NSEvent) {
-        let didResize = resizeState != nil
-        resizeState = nil
-        if didResize {
-            (window?.windowController as? MirrorWindowController)?.endInteractiveResize()
-        }
-        (window as? MirrorPanel)?.activeResizeCursor = nil
-        syncResizeCursor(with: event)
+        MirrorWindowGestures.finishMouseUp(with: event, in: self, resizeState: &resizeState)
         super.mouseUp(with: event)
     }
 
     override func scrollWheel(with event: NSEvent) {
-        window?.adjustMirrorOpacity(with: event)
+        MirrorWindowGestures.scrollWheel(with: event, in: self)
     }
 
     func updateMirroring() {

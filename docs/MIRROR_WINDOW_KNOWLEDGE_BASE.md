@@ -51,7 +51,7 @@ graph TD
     B -->|positionWindowIfNeeded| D[恢复持久化帧或<br/>鼠标处居中定位]
     B -->|sessionManager.start| E[采集会话<br/>CameraSessionManager]
     B -->|activate 后下一拍<br/>makeKeyAndOrderFront + orderFrontRegardless| F[MirrorPanel 显示]
-    G[宿主视图<br/>DraggableHostingView/PreviewHostingView] -->|鼠标事件| H[交互分发]
+    G[宿主视图<br/>DraggableHostingView/PreviewHostingView] -->|转发| H[MirrorWindowGestures<br/>交互分发]
     H -->|外环拖拽| I[resizeMirror 几何缩放<br/>centerInScreen 保持不变]
     H -->|双击| J[hideMirror<br/>持久化+stop+orderOut]
     H -->|滚轮| K[adjustMirrorOpacity<br/>透明度 0.1~1.0]
@@ -167,7 +167,7 @@ stateDiagram-v2
 - 内容层：`MirrorContentView` 套 `GeometryReader` + `.clipShape(Circle()).contentShape(Circle())` 裁成圆形命中区域；
 - 预览层：`PreviewHostingView`（`AVCaptureVideoPreviewLayer`）`layer.masksToBounds = true`，在 `layout()` 中设 `cornerRadius = bounds.width / 2`，配合 `AVCaptureVideoPreviewLayer.videoGravity = .resizeAspectFill` **镜像适应填满** 圆形画面。
 
-视图层级：`MirrorPanel.contentView = DraggableHostingView`（NSHostingView，承载整个 SwiftUI 内容 → `MirrorContentView` → 产出 `CameraPreviewView`）→ 内部 `PreviewHostingView`（NSView，悬挂 `AVCaptureVideoPreviewLayer` 预览层）。**`DraggableHostingView` 与 `PreviewHostingView` 各自实现了一套相同的鼠标交互（mouseDown/mouseDragged/mouseUp/scrollWheel/双击）**：默认态命中 `PreviewHostingView` 的分发，非预览态（权限降级/错误占位）命中 `DraggableHostingView` 的分发。**改任何交互行为必须同步改两处，否则窗口两种内容状态下手势行为不一致。**
+视图层级：`MirrorPanel.contentView = DraggableHostingView`（NSHostingView，承载整个 SwiftUI 内容 → `MirrorContentView` → 产出 `CameraPreviewView`）→ 内部 `PreviewHostingView`（NSView，悬挂 `AVCaptureVideoPreviewLayer` 预览层）。默认态命中 `PreviewHostingView` 的分发，非预览态（权限降级/错误占位）命中 `DraggableHostingView` 的分发；**双击隐藏 / 外环缩放 / 拖拽移动 / 滚轮透明度** 的事件处理已收敛到 `MirrorWindowGestures`（`MirrorApp/MirrorWindowGestures.swift`），两宿主只转发，禁止再各写一份。
 
 ## §2.5 物理路径速查
 
@@ -175,7 +175,7 @@ stateDiagram-v2
 
 | 目录（相对项目根） | 内容 | 关键文件 |
 |------|------|---------|
-| `MirrorApp/` | 全部源码（单 target `Mirror`） | `MirrorWindowController.swift`（窗口与交换逻辑）、`CameraPreviewView.swift`（预览层） |
+| `MirrorApp/` | 全部源码（单 target `Mirror`） | `MirrorWindowController.swift`（窗口与交换逻辑）、`CameraPreviewView.swift`（预览层）、`MirrorWindowGestures.swift`（拖拽/缩放/透明度共用手势） |
 | `MirrorApp/Info.plist` | `NSCameraUsageDescription` 相机用途描述 | 权限弹窗文案 |
 | `project.yml` | XcodeGen 工程定义（唯一工程真实来源） | `bundleIdPrefix` / `deploymentTarget` / Swift 6 并发 |
 | `Mirror.xcodeproj/` | 由 `xcodegen generate` 生成的工程（禁止手改） | — |
@@ -195,6 +195,7 @@ stateDiagram-v2
 | 位置恢复 | 窗口控制器 | `MirrorWindowController.restorePersistedFrameIfPossible()` | 校验帧与可见屏幕相交 |
 | 几何缩放 | 窗口控制器 | `MirrorWindowController.resizeMirror(using:state:)` | 缩放算法，中心固定的关键语义 |
 | 透明度调节 | NSWindow 扩展 | `NSWindow.adjustMirrorOpacity(with:)` | 滚轮调透明度 |
+| 拖拽/缩放/透明度手势分发 | `MirrorWindowGestures.swift` | `MirrorWindowGestures` | 两宿主共用；改交互只改这里 |
 | 窗口事件 | 窗口控制器 | `MirrorWindowController.windowDidMove/_windowDidResize/_windowDidEndLiveResize` | 事件驱动持久化（缩放中抑制） |
 | 缩放命中判定 | NSView 扩展 | `NSView.isInResizeRing` / `NSView.resizeHandle(at:)` | 环形热区判定（§2.1） |
 | 预览宿主视图 | `CameraPreviewView.swift` | `PreviewHostingView` | `AVCaptureVideoPreviewLayer` 管理与镜像 |

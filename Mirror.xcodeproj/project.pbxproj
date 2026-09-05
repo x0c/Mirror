@@ -19,6 +19,7 @@
 		82CD14E064B963F393FA076C /* MacKitLaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 2335417DD19E9EFCB176AFCA /* MacKitLaunchAtLogin */; };
 		D206BA69CCFCBD821C5FC0EC /* CameraSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */; };
 		E9FA823A77FB15D6CF60776C /* MacKitCore in Frameworks */ = {isa = PBXBuildFile; productRef = 15CAF807F43F7068E3E66F71 /* MacKitCore */; };
+		F8373F23C647D12EFB8C56E8 /* MirrorWindowGestures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B201F3C7AFD222E56EBA4836 /* MirrorWindowGestures.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionManager.swift; sourceTree = "<group>"; };
 		83D823A35DF15C8E2262C1DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A7694174E706F8BA4FE189A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B201F3C7AFD222E56EBA4836 /* MirrorWindowGestures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorWindowGestures.swift; sourceTree = "<group>"; };
 		C85C787AFF011A304E57654E /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 		CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		D4E6770F8388BD9E0D219A27 /* Mirror.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Mirror.entitlements; sourceTree = "<group>"; };
@@ -62,6 +64,7 @@
 				D4E6770F8388BD9E0D219A27 /* Mirror.entitlements */,
 				2BDA81A34E10BAA089954096 /* MirrorApp.swift */,
 				0246326DA58632EA987559B9 /* MirrorWindowController.swift */,
+				B201F3C7AFD222E56EBA4836 /* MirrorWindowGestures.swift */,
 				C85C787AFF011A304E57654E /* StatusBarController.swift */,
 			);
 			path = MirrorApp;
@@ -168,6 +171,7 @@
 				3050E81FD5B12AA4D8AA9F21 /* MenuBarSupport.swift in Sources */,
 				4BCAABE5B90056AC2FA66E3B /* MirrorApp.swift in Sources */,
 				350D6E0D3908E23D56C72158 /* MirrorWindowController.swift in Sources */,
+				F8373F23C647D12EFB8C56E8 /* MirrorWindowGestures.swift in Sources */,
 				1CEA61764A98BE923233DD78 /* StatusBarController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
