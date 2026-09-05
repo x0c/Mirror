@@ -77,7 +77,15 @@ final class CameraSessionManager {
     }
 
     func stop() {
-        isPreviewRequested = false
+        stopCapture(clearPreviewRequest: true)
+    }
+
+    /// 停采集。`clearPreviewRequest == false` 时保留「窗口仍要画面」意图（运行中撤权降级），
+    /// 否则降级态轮询 / recheck 会因 isPreviewRequested == false 永远无法恢复。
+    private func stopCapture(clearPreviewRequest: Bool) {
+        if clearPreviewRequest {
+            isPreviewRequested = false
+        }
         sessionQueue.async { [session] in
             guard session.isRunning else {
                 return
@@ -102,7 +110,8 @@ final class CameraSessionManager {
 
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized, .notDetermined:
-            stop()
+            // 不清 isPreviewRequested：停一下再 start，意图仍是「镜子要画面」。
+            stopCapture(clearPreviewRequest: false)
             start()
         default:
             break
@@ -192,7 +201,8 @@ final class CameraSessionManager {
 
             Task { @MainActor in
                 self.state = .unauthorized
-                self.stop()
+                // 窗口仍在显示降级态：停采集但保留预览意图，否则 recheck / 轮询被短路。
+                self.stopCapture(clearPreviewRequest: false)
             }
         }
     }

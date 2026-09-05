@@ -91,12 +91,15 @@ stateDiagram-v2
 
 ### 停止流程（`stop()`）
 
-1. `sessionQueue.async` 上 `session.stopRunning()`（`guard session.isRunning`）。
-2. 主线程若状态是 `.running` → 置 `.idle`。
+1. 清除 `isPreviewRequested`（表示窗口不再要画面）。
+2. `sessionQueue.async` 上 `session.stopRunning()`（`guard session.isRunning`）。
+3. 主线程若状态是 `.running` → 置 `.idle`。
+
+隐藏镜子走公开 `stop()`。运行中权限被撤销、以及 `recheckAuthorization` 内部重启，走 `stopCapture(clearPreviewRequest: false)`：**只停采集、保留预览意图**。若误清 `isPreviewRequested`，降级态轮询会被短路，用户重新授权后画面永远不回来。
 
 ### 权限恢复流程（`recheckAuthorization()`）
 
-仅当当前状态是 `.unauthorized`，且系统权限已变成 `.authorized` **或** `.notDetermined`（例如 `tccutil reset`）时生效：先 `stop()` 再 `start()`，由 `prepareIfNeeded()` 配置或重新弹窗。若仍是 `.denied` / `.restricted` 则保持降级态。
+仅当 `isPreviewRequested == true` 且当前状态是 `.unauthorized`，并且系统权限已变成 `.authorized` **或** `.notDetermined`（例如 `tccutil reset`）时生效：先 `stopCapture(clearPreviewRequest: false)` 再 `start()`，由 `prepareIfNeeded()` 配置或重新弹窗。若仍是 `.denied` / `.restricted` 则保持降级态。
 
 `configureSessionIfNeeded()` 在 `isConfigured == true` 时若仍停在 `.unauthorized`，会先回到 `.idle`，避免「已授权但 start() 因 unauthorized 直接 return」的死锁。
 
@@ -106,6 +109,7 @@ stateDiagram-v2
 - `MirrorWindowController.windowDidBecomeKey`
 - `CameraPermissionDeniedView` 的 `onAppear`、同名 active 通知，以及降级态可见期间约 0.8 秒一次的轮询
 
+**【禁止】**运行中撤权的 runtime error 回调里调用会清掉 `isPreviewRequested` 的 `stop()`——窗口仍在显示降级态时必须保留预览意图。
 ### 配置流程（`configureSessionIfNeeded()`，一次性）
 
 1. `guard !isConfigured`，已配置过直接返回。
@@ -162,6 +166,7 @@ stateDiagram-v2
 
 - 【禁止】**Release / 公证包缺少摄像头 entitlement** -> 加固运行时默认禁止访问摄像头。只写 `NSCameraUsageDescription`、只在系统设置里打开开关都不够；签名里必须有 `com.apple.security.device.camera`。1.0.3 正式包 entitlements 为空，表现为「系统设置已允许，镜子仍显示未获得权限」。Debug 默认不开加固运行时，所以本机调试可能看不出这个问题。
 - 【禁止】**窗口未显示就启动采集** -> 宿主视图在 `orderOut` 的面板上也会 `onAppear`。采集只由窗口 `showMirror()` 启动；`recheckAuthorization()` 在 `isPreviewRequested == false` 时直接返回，避免隐藏后仍把摄像头打开。
+- 【禁止】**运行中撤权时用公开 `stop()` 清掉预览意图** -> runtime error / `recheckAuthorization` 内部重启必须 `stopCapture(clearPreviewRequest: false)`。清掉后降级态轮询永远短路，重新授权也不出画面。
 - 【禁止】**绕过权限检查直接启动采集** -> 必须走 `prepareIfNeeded()` 的状态机（系统对摄像头权限有硬性门禁，无权限时启动只会失败或黑屏）。
 - 【禁止】**在主线程调用 `startRunning()` / `stopRunning()` / `beginConfiguration()`** -> 必须经 `sessionQueue`（`com.x0c.mirror.camera` 串行队列）执行。**AI 易错点**：直接在主线程操作 `AVCaptureSession` 会卡 UI 或产生竞态，错误只在特定时序下出现。
 - 【禁止】**跨线程直接读写 `state` / `isMirrored`** -> 整个类 `@MainActor` 隔离；`session` 与 `sessionQueue` 是仅有的两处 `nonisolated` 跨线程桥梁，新加成员变量若被后台队列访问必须显式标注隔离。

@@ -1,5 +1,4 @@
 import AppKit
-import MacKitCore
 import MacKitLifecycle
 import Sparkle
 
@@ -72,12 +71,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        // reopen 不是登录拉起；图标始终可见时策略为 .none，仍出示镜子（产品：再次打开即见镜像）。
-        _ = MenuBarReopenPolicy.presentation(
-            iconVisible: iconStore.isVisible,
-            isReopenOrLaunch: true,
-            isLoginLaunch: false
-        )
+        // 已在跑时从「应用程序」/ Spotlight 再次打开：用户主动操作，开镜子。
+        // 冷启动 / 登录项只走 didFinishLaunching，不会进这里；图标强制可见，无需恢复窗策略。
         mirrorWindowController?.showMirror()
         return true
     }
