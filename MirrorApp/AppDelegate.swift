@@ -1,8 +1,12 @@
 import AppKit
+import MacKitCore
 import MacKitLifecycle
 import Sparkle
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    /// 供设置窗调用；SwiftUI 生命周期下对 `NSApp.delegate` 转型常会失败。
+    private(set) static weak var shared: AppDelegate?
+
     private var statusBarController: StatusBarController?
     private let updaterController = SPUStandardUpdaterController(
         startingUpdater: true,
@@ -10,12 +14,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         userDriverDelegate: nil
     )
     private var mirrorWindowController: MirrorWindowController?
+    private var cameraSessionManager: CameraSessionManager?
     private var cameraPermissionObserver: NSObjectProtocol?
     private let iconStore = MenuBarIconStore.shared
     private let launchAtLogin = MirrorLaunchAtLogin()
     private let terminationGuard = TerminationGuard()
+    /// 后台就绪时刻；二次启动防呆用。
+    private var becameReadyAt: Date?
+
+    override init() {
+        super.init()
+        AppDelegate.shared = self
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        AppDelegate.shared = self
         NSApp.setActivationPolicy(.accessory)
         terminationGuard.isUpdateSessionInProgress = { [weak self] in
             self?.updaterController.updater.sessionInProgress ?? false
@@ -27,6 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let sessionManager = CameraSessionManager()
+        cameraSessionManager = sessionManager
         observeCameraReactivation(sessionManager)
 
         let windowController = MirrorWindowController(sessionManager: sessionManager)
@@ -50,16 +64,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             toggleMirroring: {
                 sessionManager.toggleMirroring()
             },
+            openSettings: { [weak self] in
+                self?.openSettings()
+            },
             checkForUpdates: { [weak self] in
-                self?.updaterController.checkForUpdates(nil)
+                self?.checkForUpdates()
             },
             onQuit: { [weak self] in
-                self?.terminationGuard.requestTermination()
+                self?.requestTermination()
             }
         )
 
         // 冷启动与登录项一律只就绪菜单栏；禁止自动开镜子/摄像头。
-        // 仅用户左键、菜单「显示镜像」、或 applicationShouldHandleReopen 才 showMirror()。
+        becameReadyAt = Date()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -71,10 +88,65 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        // 已在跑时从「应用程序」/ Spotlight 再次打开：用户主动操作，开镜子。
-        // 冷启动 / 登录项只走 didFinishLaunching，不会进这里；图标强制可见，无需恢复窗策略。
-        mirrorWindowController?.showMirror()
+        // 菜单栏即主入口：就绪后默认 60 秒内再次打开须出配置窗（不论图标是否可见）。
+        let elapsed = becameReadyAt.map { Date().timeIntervalSince($0) }
+        if MenuBarReopenPolicy.presentation(
+            iconVisible: iconStore.isVisible,
+            isReopenOrLaunch: true,
+            menubarIsPrimaryEntry: true,
+            secondsSinceReady: elapsed
+        ) == .showRecoveryWindow {
+            openSettings()
+        }
         return true
+    }
+
+    func showMirror() {
+        mirrorWindowController?.showMirror()
+    }
+
+    func toggleMirrorVisibility() {
+        mirrorWindowController?.toggle()
+    }
+
+    func isMirrorVisible() -> Bool {
+        mirrorWindowController?.isVisible ?? false
+    }
+
+    func isMirrored() -> Bool {
+        cameraSessionManager?.isMirrored ?? true
+    }
+
+    func toggleMirroring() {
+        cameraSessionManager?.toggleMirroring()
+    }
+
+    func launchAtLoginSnapshot() -> (isOn: Bool, needsApproval: Bool) {
+        launchAtLogin.refresh()
+        let status = launchAtLogin.status
+        return (status.isEffectivelyEnabled, status == .needsApproval)
+    }
+
+    func setLaunchAtLogin(_ enabled: Bool) {
+        launchAtLogin.refresh()
+        launchAtLogin.setEnabled(enabled)
+    }
+
+    func openLoginItemsSettings() {
+        launchAtLogin.openSystemSettings()
+    }
+
+    func openSettings() {
+        NSApp.activate(ignoringOtherApps: true)
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+    }
+
+    func checkForUpdates() {
+        updaterController.checkForUpdates(nil)
+    }
+
+    func requestTermination() {
+        terminationGuard.requestTermination()
     }
 
     /// 用户去系统设置重新打开摄像头授权后，切回本应用时自动重新检测，

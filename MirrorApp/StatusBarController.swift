@@ -11,6 +11,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let toggleMirroringHandler: () -> Void
     private let isMirroredHandler: () -> Bool
     private let launchAtLogin: MirrorLaunchAtLogin
+    private let openSettingsHandler: () -> Void
     private let checkForUpdatesHandler: () -> Void
     private let onQuit: () -> Void
     private let iconStore: MenuBarIconStore
@@ -35,6 +36,11 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         action: #selector(handleOpenLoginItemsSettings),
         keyEquivalent: ""
     )
+    private lazy var settingsItem = NSMenuItem(
+        title: "设置…",
+        action: #selector(handleOpenSettings),
+        keyEquivalent: ","
+    )
     private lazy var checkForUpdatesItem = NSMenuItem(
         title: "检查更新…",
         action: #selector(handleCheckForUpdates),
@@ -49,6 +55,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         showMirror: @escaping () -> Void,
         isMirrored: @escaping () -> Bool,
         toggleMirroring: @escaping () -> Void,
+        openSettings: @escaping () -> Void,
         checkForUpdates: @escaping () -> Void,
         onQuit: @escaping () -> Void
     ) {
@@ -59,6 +66,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         self.showMirrorHandler = showMirror
         self.isMirroredHandler = isMirrored
         self.toggleMirroringHandler = toggleMirroring
+        self.openSettingsHandler = openSettings
         self.checkForUpdatesHandler = checkForUpdates
         self.onQuit = onQuit
         super.init()
@@ -94,6 +102,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         mirroringItem.target = self
         launchAtLoginItem.target = self
         approveLaunchAtLoginItem.target = self
+        settingsItem.target = self
         checkForUpdatesItem.target = self
 
         let quitItem = NSMenuItem(
@@ -110,6 +119,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         menu.addItem(launchAtLoginItem)
         menu.addItem(approveLaunchAtLoginItem)
         menu.addItem(.separator())
+        menu.addItem(settingsItem)
         menu.addItem(checkForUpdatesItem)
         menu.addItem(.separator())
         menu.addItem(quitItem)
@@ -167,6 +177,11 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     @objc
     private func handleOpenLoginItemsSettings() {
         launchAtLogin.openSystemSettings()
+    }
+
+    @objc
+    private func handleOpenSettings() {
+        openSettingsHandler()
     }
 
     @objc

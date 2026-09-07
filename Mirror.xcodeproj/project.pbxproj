@@ -12,6 +12,7 @@
 		1F52D1087DF11832349B8BAE /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */; };
 		3050E81FD5B12AA4D8AA9F21 /* MenuBarSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095A97CEEB61A5399971160B /* MenuBarSupport.swift */; };
 		350D6E0D3908E23D56C72158 /* MirrorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0246326DA58632EA987559B9 /* MirrorWindowController.swift */; };
+		41696B1BD7575AC21CC67C31 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C2ABAC840FDC0193EF1E84 /* SettingsView.swift */; };
 		4BCAABE5B90056AC2FA66E3B /* MirrorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BDA81A34E10BAA089954096 /* MirrorApp.swift */; };
 		6D97566101DD30A780A859B4 /* MacKitLifecycle in Frameworks */ = {isa = PBXBuildFile; productRef = C75383357A2C5C38C51A6488 /* MacKitLifecycle */; };
 		72D5C296EDF876AE28E7A601 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 602BFFF476991A9B6215E2AC /* Sparkle */; };
@@ -27,6 +28,7 @@
 		095A97CEEB61A5399971160B /* MenuBarSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarSupport.swift; sourceTree = "<group>"; };
 		1AEC7BFFF344962F26EC8458 /* Mirror.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mirror.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BDA81A34E10BAA089954096 /* MirrorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorApp.swift; sourceTree = "<group>"; };
+		35C2ABAC840FDC0193EF1E84 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionManager.swift; sourceTree = "<group>"; };
 		83D823A35DF15C8E2262C1DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A7694174E706F8BA4FE189A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -65,6 +67,7 @@
 				2BDA81A34E10BAA089954096 /* MirrorApp.swift */,
 				0246326DA58632EA987559B9 /* MirrorWindowController.swift */,
 				B201F3C7AFD222E56EBA4836 /* MirrorWindowGestures.swift */,
+				35C2ABAC840FDC0193EF1E84 /* SettingsView.swift */,
 				C85C787AFF011A304E57654E /* StatusBarController.swift */,
 			);
 			path = MirrorApp;
@@ -172,6 +175,7 @@
 				4BCAABE5B90056AC2FA66E3B /* MirrorApp.swift in Sources */,
 				350D6E0D3908E23D56C72158 /* MirrorWindowController.swift in Sources */,
 				F8373F23C647D12EFB8C56E8 /* MirrorWindowGestures.swift in Sources */,
+				41696B1BD7575AC21CC67C31 /* SettingsView.swift in Sources */,
 				1CEA61764A98BE923233DD78 /* StatusBarController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -253,14 +257,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.11;
+				MARKETING_VERSION = 1.0.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -337,14 +341,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.11;
+				MARKETING_VERSION = 1.0.12;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -387,7 +391,7 @@
 			repositoryURL = "https://github.com/x0c/mac-kit-swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.2;
+				minimumVersion = 0.1.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
