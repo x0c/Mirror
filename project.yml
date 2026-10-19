@@ -56,6 +56,7 @@ targets:
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         LSMinimumSystemVersion: "$(MACOSX_DEPLOYMENT_TARGET)"
         LSUIElement: true
+        LSApplicationCategoryType: public.app-category.utilities
         NSCameraUsageDescription: 需要访问前置摄像头来显示镜子画面。
         NSHumanReadableCopyright: "Copyright © 2026 x0c"
         SUFeedURL: "https://github.com/x0c/Mirror/releases/latest/download/appcast.xml"
