@@ -4,4 +4,3 @@
 
 | 任务 | 状态 | 影响范围 | 开始 | 最近更新 | 备注 |
 |---|---|---|---|---|---|
-| Codex fork / remaining-settings: native Settings retrofit | 验证中 | 设置页及窗口入口、相关产品文档、project.yml、构建/发布脚本（必要修复）、正式发布与安装截图验收 | 15:32 | 2026-10-19 15:37 | 英中浅色 480×258 实窗已验；准备 1.0.13(14) 正式发布。用户指定独立于 Corral 原会话；Xcode + Sparkle + MacKit；不操作 Corral/全局外观/虚拟屏。 |
