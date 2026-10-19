@@ -1,7 +1,7 @@
 # Mirror
 
 <p align="center">
-  <img src="MirrorApp/Assets.xcassets/AppIcon.appiconset/AppIcon-mac-app-512x512@2x.png" alt="Mirror app icon" width="160">
+  <img src="docs/images/app-icon.png" alt="Mirror app icon" width="160">
 </p>
 
 A simple native macOS camera mirror. Floating preview above other windows, controlled from the menu bar.

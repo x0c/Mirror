@@ -63,11 +63,15 @@ if [[ "$LOCAL_ONLY" == false ]]; then
     || die "拒绝把公开更新清单回退到较低构建号"
 fi
 
+step "核对可复现的提交状态"
+[[ -z "$(git status --porcelain)" ]] || die "发布前必须提交完整工作区"
+git push origin main
+
 step "生成工程并按 Developer ID 归档导出"
 xcodegen generate >/dev/null
 rm -rf "$ARCHIVE_PATH" "$EXPORT_DIR"
-xcodebuild -project Mirror.xcodeproj -scheme Mirror -configuration Release -destination 'platform=macOS' \
-  -derivedDataPath "$DERIVED_DATA" -archivePath "$ARCHIVE_PATH" -allowProvisioningUpdates ARCHS=arm64 archive >/dev/null
+xcodebuild -project Mirror.xcodeproj -scheme Mirror -configuration Release -destination 'generic/platform=macOS' \
+  -derivedDataPath "$DERIVED_DATA" -archivePath "$ARCHIVE_PATH" -allowProvisioningUpdates 'ARCHS=arm64 x86_64' ONLY_ACTIVE_ARCH=NO archive 2>&1 | tee "$BUILD_DIR/archive.log"
 cat > "$work_dir/ExportOptions.plist" <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -80,7 +84,7 @@ cat > "$work_dir/ExportOptions.plist" <<'EOF'
 </dict></plist>
 EOF
 xcodebuild -exportArchive -archivePath "$ARCHIVE_PATH" -exportOptionsPlist "$work_dir/ExportOptions.plist" \
-  -exportPath "$EXPORT_DIR" -allowProvisioningUpdates >/dev/null
+  -exportPath "$EXPORT_DIR" -allowProvisioningUpdates 2>&1 | tee "$BUILD_DIR/export.log"
 [[ -d "$APP_PATH" ]] || die "Developer ID 导出产物不存在"
 
 step "校验应用和内嵌更新组件签名"
@@ -134,8 +138,6 @@ if [[ "$LOCAL_ONLY" == true ]]; then
 fi
 
 step "提交源码、创建标签并发布首装包与更新清单"
-git add -A
-git commit -m "发布 Mirror ${version}" || true
 git tag -a "v${version}" -m "Mirror ${version}" 2>/dev/null || true
 git push origin main --follow-tags
 
@@ -155,8 +157,18 @@ grep -q 'sparkle-signatures:' "$appcast_dir/appcast.xml" || die "更新清单本
 # 清单、更新包、首装包全部发在同一源码仓 Release；禁止另建更新仓。
 # 创建发行页不要夹带安装包（uploads.github.com 会 404）；先建空页再逐个上传。
 if ! gh release view "v${version}" --repo "$SOURCE_REPO" >/dev/null 2>&1; then
-  gh release create "v${version}" --repo "$SOURCE_REPO" --title "Mirror ${version}" \
-    --notes "- 正式提供已签名并公证的 DMG 首装包。"$'\n'"- 支持安全的应用内自动更新。"
+  cat > "$work_dir/notes.md" <<'NOTES'
+## English
+- Refined Settings into a native grouped form with aligned controls and a compact app identity row.
+- All settings fit without scrolling; English and Simplified Chinese are supported.
+- Preserved mirror, login startup, update and quit actions. Opening Settings never starts the camera.
+
+## 简体中文
+- 设置页改为原生分组表单，控件对齐，应用信息与更新、退出整合为一行。
+- 全部设置一屏可见，无需滚动，支持英文与简体中文。
+- 保留镜像、自启、更新和退出能力；打开设置不会启动摄像头。
+NOTES
+  gh release create "v${version}" --repo "$SOURCE_REPO" --title "Mirror ${version}" --notes-file "$work_dir/notes.md"
 fi
 for asset_path in "$dmg_path#Mirror.dmg" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml"; do
   gh release upload "v${version}" "$asset_path" --repo "$SOURCE_REPO" --clobber
@@ -173,6 +185,9 @@ for _try in 1 2 3 4 5 6; do
   sleep 5
 done
 [[ "$anonymous_ok" -eq 1 ]] || die "公开发行页附件尚未可匿名下载"
+cmp "$dmg_path" "$work_dir/anonymous.dmg" || die "公开 DMG 与正式产物不一致"
+curl -fsSL "https://github.com/${SOURCE_REPO}/releases/download/v${version}/Mirror-${version}.zip" -o "$work_dir/anonymous.zip"
+cmp "$zip_path" "$work_dir/anonymous.zip" || die "公开 ZIP 与正式产物不一致"
 xmllint --noout "$work_dir/anonymous-appcast.xml"
 grep -q "${SOURCE_REPO}/releases/download/v${version}/Mirror-${version}.zip" "$work_dir/anonymous-appcast.xml" \
   || die "公开更新清单没有指向本仓当前更新包"

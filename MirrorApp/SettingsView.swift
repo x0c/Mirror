@@ -1,33 +1,64 @@
+import AppKit
 import SwiftUI
 
-/// 配置窗：右键菜单能力的对等入口（裁定 2026-09-07）。
 struct SettingsView: View {
     @State private var isMirrored = true
     @State private var mirrorVisible = false
     @State private var launchAtLoginOn = false
     @State private var launchNeedsApproval = false
+    @State private var contentHeight: CGFloat = 300
 
     var body: some View {
+        sizedForm
+            .frame(width: 480)
+            .fixedSize()
+            .focusEffectDisabled()
+            .background(SettingsWindowObserver())
+            .onAppear(perform: refresh)
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+                refresh()
+            }
+            .onExitCommand { SettingsWindowController.shared.close() }
+    }
+
+    @ViewBuilder
+    private var sizedForm: some View {
+        if #available(macOS 15, *) {
+            settingsForm
+                .onScrollGeometryChange(for: CGFloat.self) { ceil($0.contentSize.height) } action: { _, height in
+                    if height > 0 { contentHeight = height }
+                }
+                .frame(height: contentHeight)
+        } else {
+            settingsForm.frame(height: 350)
+        }
+    }
+
+    private var settingsForm: some View {
         Form {
             Section {
-                Button(mirrorVisible ? "隐藏镜像" : "显示镜像") {
-                    if mirrorVisible {
-                        AppDelegate.shared?.toggleMirrorVisibility()
-                    } else {
-                        AppDelegate.shared?.showMirror()
+                LabeledContent("settings.preview") {
+                    Button(mirrorVisible ? String(localized: "settings.hide") : String(localized: "settings.show")) {
+                        if mirrorVisible {
+                            AppDelegate.shared?.toggleMirrorVisibility()
+                        } else {
+                            AppDelegate.shared?.showMirror()
+                        }
+                        refresh()
                     }
-                    refresh()
                 }
 
-                Toggle("水平镜像", isOn: Binding(
+                Toggle("settings.horizontal_mirroring", isOn: Binding(
                     get: { isMirrored },
                     set: { _ in
                         AppDelegate.shared?.toggleMirroring()
                         refresh()
                     }
                 ))
+            }
 
-                Toggle("开机时启动 Mirror", isOn: Binding(
+            Section {
+                Toggle("settings.launch_at_login", isOn: Binding(
                     get: { launchAtLoginOn },
                     set: { enabled in
                         AppDelegate.shared?.setLaunchAtLogin(enabled)
@@ -36,29 +67,43 @@ struct SettingsView: View {
                 ))
 
                 if launchNeedsApproval {
-                    Text("系统仍在等待批准开机启动。")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                    Button("前往系统设置完成开机启动批准") {
-                        AppDelegate.shared?.openLoginItemsSettings()
+                    LabeledContent {
+                        Button("settings.open_system_settings") {
+                            AppDelegate.shared?.openLoginItemsSettings()
+                        }
+                    } label: {
+                        Label {
+                            Text("settings.approval_required").foregroundStyle(.secondary)
+                        } icon: {
+                            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                        }
                     }
                 }
             }
 
-            Section {
-                Button("检查更新…") {
-                    AppDelegate.shared?.checkForUpdates()
-                }
-                Button("退出 Mirror") {
-                    AppDelegate.shared?.requestTermination()
-                }
-            }
+            Section { aboutRow }
         }
         .formStyle(.grouped)
-        .frame(width: 380)
-        .onAppear(perform: refresh)
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            refresh()
+        .toggleStyle(.switch)
+        .scrollDisabled(true)
+    }
+
+    private var aboutRow: some View {
+        HStack(spacing: 10) {
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 32, height: 32)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(verbatim: "Mirror").fontWeight(.medium)
+                Text(verbatim: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .accessibilityElement(children: .combine)
+            Spacer(minLength: 12)
+            Button("settings.check_for_updates") { AppDelegate.shared?.checkForUpdates() }
+            Button("settings.quit") { AppDelegate.shared?.requestTermination() }
         }
     }
 

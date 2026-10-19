@@ -18,7 +18,9 @@
 		72D5C296EDF876AE28E7A601 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 602BFFF476991A9B6215E2AC /* Sparkle */; };
 		746DBF28E92F9C8C1A354D1F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D823A35DF15C8E2262C1DB /* AppDelegate.swift */; };
 		82CD14E064B963F393FA076C /* MacKitLaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 2335417DD19E9EFCB176AFCA /* MacKitLaunchAtLogin */; };
+		B1284DC67155E18406266D37 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35960FD09F72B72F06D15454 /* SettingsWindowController.swift */; };
 		D206BA69CCFCBD821C5FC0EC /* CameraSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */; };
+		E73278DB4AEC9C66421345E2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F1B76CDDD525FA0E8EA23FDA /* Localizable.xcstrings */; };
 		E9FA823A77FB15D6CF60776C /* MacKitCore in Frameworks */ = {isa = PBXBuildFile; productRef = 15CAF807F43F7068E3E66F71 /* MacKitCore */; };
 		F8373F23C647D12EFB8C56E8 /* MirrorWindowGestures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B201F3C7AFD222E56EBA4836 /* MirrorWindowGestures.swift */; };
 /* End PBXBuildFile section */
@@ -28,6 +30,7 @@
 		095A97CEEB61A5399971160B /* MenuBarSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarSupport.swift; sourceTree = "<group>"; };
 		1AEC7BFFF344962F26EC8458 /* Mirror.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mirror.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BDA81A34E10BAA089954096 /* MirrorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorApp.swift; sourceTree = "<group>"; };
+		35960FD09F72B72F06D15454 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		35C2ABAC840FDC0193EF1E84 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionManager.swift; sourceTree = "<group>"; };
 		83D823A35DF15C8E2262C1DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -36,6 +39,7 @@
 		C85C787AFF011A304E57654E /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 		CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		D4E6770F8388BD9E0D219A27 /* Mirror.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Mirror.entitlements; sourceTree = "<group>"; };
+		F1B76CDDD525FA0E8EA23FDA /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F83C6AEEDEDBC96ACB2EA50A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -62,12 +66,14 @@
 				CC46FD99734B159BA1A4C142 /* CameraPreviewView.swift */,
 				4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */,
 				A7694174E706F8BA4FE189A3 /* Info.plist */,
+				F1B76CDDD525FA0E8EA23FDA /* Localizable.xcstrings */,
 				095A97CEEB61A5399971160B /* MenuBarSupport.swift */,
 				D4E6770F8388BD9E0D219A27 /* Mirror.entitlements */,
 				2BDA81A34E10BAA089954096 /* MirrorApp.swift */,
 				0246326DA58632EA987559B9 /* MirrorWindowController.swift */,
 				B201F3C7AFD222E56EBA4836 /* MirrorWindowGestures.swift */,
 				35C2ABAC840FDC0193EF1E84 /* SettingsView.swift */,
+				35960FD09F72B72F06D15454 /* SettingsWindowController.swift */,
 				C85C787AFF011A304E57654E /* StatusBarController.swift */,
 			);
 			path = MirrorApp;
@@ -135,6 +141,7 @@
 			knownRegions = (
 				Base,
 				en,
+				"zh-Hans",
 			);
 			mainGroup = 60677C36157AC41ADAC5FABD;
 			minimizedProjectReferenceProxies = 1;
@@ -158,6 +165,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1AD7F95A83BA08E292013942 /* Assets.xcassets in Resources */,
+				E73278DB4AEC9C66421345E2 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,6 +184,7 @@
 				350D6E0D3908E23D56C72158 /* MirrorWindowController.swift in Sources */,
 				F8373F23C647D12EFB8C56E8 /* MirrorWindowGestures.swift in Sources */,
 				41696B1BD7575AC21CC67C31 /* SettingsView.swift in Sources */,
+				B1284DC67155E18406266D37 /* SettingsWindowController.swift in Sources */,
 				1CEA61764A98BE923233DD78 /* StatusBarController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -257,14 +266,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.12;
+				MARKETING_VERSION = 1.0.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -341,14 +350,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.12;
+				MARKETING_VERSION = 1.0.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};

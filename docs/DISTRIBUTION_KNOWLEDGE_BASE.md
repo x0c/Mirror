@@ -35,3 +35,9 @@ Mirror 是公开自分发的 macOS 应用。每个正式版本同时交付两条
 摄像头画面和用户偏好始终只在本机处理。应用仅在检查或下载更新时访问公开分发服务。更新签名私钥只能保存在本机钥匙串，苹果公证密钥只能保存在本机私有密钥目录；两者均不得写进仓库、日志或发布说明。
 
 <!-- 该文档整理/压缩于 2026-09-05 -->
+
+## Settings delivery diagnostics (2026-10-19)
+
+Settings releases must commit and push the complete source before building/installing, retain complete archive/export diagnostics (not redirect compiler output to `/dev/null`), and build both arm64 and x86_64. The release runner may continue in a detached Python `start_new_session=True` process during Apple notarization; reuse accepted/stapled artifacts after an attachment-only failure. Release notes are English first followed by complete Simplified Chinese. Anonymous acceptance compares downloaded DMG and ZIP bytes and the signed appcast against the actual release artifacts.
+
+Diagnostic assessment for the settings retrofit: fresh Debug build and static analysis passed with no Swift compiler/analyzer diagnostics. Xcode selected the first of two architecture destinations for `platform=macOS`; use an explicit architecture for subsequent Debug checks and a generic universal archive for delivery. AppIntents metadata extraction was skipped because Mirror does not link AppIntents or define intents; no app feature depends on that metadata. This tool-generated warning remains acceptable until intent support exists. Full log: `/tmp/mirror-settings-build.log` on the acceptance host (temporary evidence, not a portable artifact).

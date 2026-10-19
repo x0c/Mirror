@@ -188,6 +188,13 @@ stateDiagram-v2
 - 【低置信度】`menu.popUp` 的 `popUp(positioning:at:in:)` 中定位 `y = button.bounds.height + 2`（图标下方）；在双屏/高分缩放屏可能偏移像素 1 个点，尚未在真实双屏环境验证（证据：`showMenu` 实现；待用户在双显示器场景确认）。
 - 【规约参考】活动感知机制（`didBecomeActive`）是可复用模式：项目内其他应用（JotBox 等）在加到 Mirror 时可直接复用本入口模式（AppDelegate `observe*` 函数 + `NotificationCenter.addObserver(forName:queue:using:)`）。
 
+## Settings layout contract (2026-10-19)
+
+- The owner prioritizes appearance and requires every settings row to be visible without scrolling or scrollbars. Mirror uses one 480-point native `Settings` window: mirror visibility and horizontal mirroring, login startup with its conditional approval notice, then one app identity/version row with Check for Updates and Quit. Menu parity and camera intent remain unchanged; opening settings never starts capture.
+- Use public SwiftUI `Settings`, grouped `Form`/`Section`, switch `Toggle`, `LabeledContent` and `Button` directly. No custom cards, focus outlines or orphan action rows. English and Simplified Chinese settings strings live in the string catalog. Escape closes the window; the native Settings menu supplies Command-comma. Existing menu/reopen routes call `OpenSettingsAction` installed by scene commands, replacing the unsupported selector route.
+- Inspected reference: `~/Codes/NeatWebApp/app-macos/Sources/NeatWebApp/Features/Settings/SettingsPanes.swift` (grouped rows, measured form height, 32-point identity row), plus `~/Codes/HandySwitch/app-macos/HandySwitch/Settings/SettingsWindowController.swift` (scene-installed settings action and window observation). Reuse their public API patterns and MacKit lifecycle behavior; product-specific labels/actions stay in Mirror. No web-app catalog or app-switching behavior is copied.
+- Official feasibility: [OpenSettingsAction](https://developer.apple.com/documentation/swiftui/opensettingsaction), [Settings window sizing](https://developer.apple.com/documentation/swiftui/scene/windowresizability(_:)), and [onScrollGeometryChange](https://developer.apple.com/documentation/swiftui/view/onscrollgeometrychange(for:of:action:)). Checked Xcode 27.2 installed SwiftUI interface: settings action is macOS 14+, scroll geometry is macOS 15+, LabeledContent and scrollDisabled are macOS 13+. Preserve macOS 14 support: use a conservative complete-content height there, measured native scroll geometry on 15+. This older-OS fallback needs separate runtime acceptance; current machine cannot establish it.
+
 ## §7 常见易忽略条件与验证路径
 
 - 改菜单栏后：重启应用（`pkill -x Mirror || true` → 启动），检查：

@@ -8,5 +8,6 @@ struct MirrorApp: App {
         Settings {
             SettingsView()
         }
+        .commands { SettingsPresenterCommands() }
     }
 }
