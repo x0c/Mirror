@@ -195,6 +195,10 @@ stateDiagram-v2
 - Inspected reference: `~/Codes/NeatWebApp/app-macos/Sources/NeatWebApp/Features/Settings/SettingsPanes.swift` (grouped rows, measured form height, 32-point identity row), plus `~/Codes/HandySwitch/app-macos/HandySwitch/Settings/SettingsWindowController.swift` (scene-installed settings action and window observation). Reuse their public API patterns and MacKit lifecycle behavior; product-specific labels/actions stay in Mirror. No web-app catalog or app-switching behavior is copied.
 - Official feasibility: [OpenSettingsAction](https://developer.apple.com/documentation/swiftui/opensettingsaction), [Settings window sizing](https://developer.apple.com/documentation/swiftui/scene/windowresizability(_:)), and [onScrollGeometryChange](https://developer.apple.com/documentation/swiftui/view/onscrollgeometrychange(for:of:action:)). Checked Xcode 27.2 installed SwiftUI interface: settings action is macOS 14+, scroll geometry is macOS 15+, LabeledContent and scrollDisabled are macOS 13+. Preserve macOS 14 support: use a conservative complete-content height there, measured native scroll geometry on 15+. This older-OS fallback needs separate runtime acceptance; current machine cannot establish it.
 
+### Settings acceptance evidence
+
+The installed Debug artifact for 1.0.13 (14) was opened through the application's normal reopen path under screen lock. Fresh English and Simplified Chinese window captures show all controls in a 480×258-point window, with aligned controls, no scrolling and no initial focus outline. No mirror window was opened and capture remained idle. Per-launch appearance arguments did not change the actual appearance: those images establish light appearance only. Dark appearance, physical keyboard/VoiceOver, the conditional login-approval state and macOS 14 fallback remain unverified on this locked macOS 27.2 host. Do not treat a successful capture or build as that interaction evidence.
+
 ## §7 常见易忽略条件与验证路径
 
 - 改菜单栏后：重启应用（`pkill -x Mirror || true` → 启动），检查：
