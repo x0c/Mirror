@@ -17,7 +17,7 @@ Mirror 是一个简单的 macOS 原生摄像头镜像工具，使用 SwiftUI 构
 **本应用正式对外自分发。**首装必须提供 Developer ID 签名、苹果公证并装订票据的 DMG；后续升级必须通过 Sparkle 的 EdDSA 签名更新清单完成。每次发布都要同时验证陌生用户可匿名下载的 DMG 与更新清单，不能只验证本机构建。
 
 - 保存的数据：镜像开关、窗口位置和尺寸、透明度等预览偏好，仅保存在这台 Mac 的本地偏好存储。
-- 当前未发现的行为：不上传摄像头画面或上述偏好，也不建立网络连接。摄像头权限只用于本地实时预览；若后续增加录制、导出、网络传输、遥测或第三方服务，必须先重新核对这段说明与隐私声明，不能沿用「纯本机」结论。
+- Data handling: current review found no upload of camera frames or preview preferences. Sparkle accesses the public distribution service to check for and download software updates. 摄像头权限只用于本地实时预览；若后续增加录制、导出、网络传输、遥测或第三方服务，必须先重新核对这段说明与隐私声明，不能沿用「纯本机」结论。
 - 改造发布、更新或首装链路时，**必须先读并落实** [签名、公证与分发指南](~/Codes/_standards/workspace-docs/swift-docs/macos-signing-notarization-distribution.md)——自行分发须完成 Developer ID 签名、公证及可获得的安全更新路径；若改走 Mac App Store，则按商店更新路径验收。同时重新按实际数据收集、权限与第三方依赖核对隐私说明和 macOS 基线，完成真实安装与升级验证后才能公开。
 
 ### 文档导航
