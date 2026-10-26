@@ -157,6 +157,10 @@ grep -q 'sparkle-signatures:' "$appcast_dir/appcast.xml" || die "更新清单本
 # 清单、更新包、首装包全部发在同一源码仓 Release；禁止另建更新仓。
 # 创建发行页不要夹带安装包（uploads.github.com 会 404）；先建空页再逐个上传。
 if ! gh release view "v${version}" --repo "$SOURCE_REPO" >/dev/null 2>&1; then
+  if [[ -n "${RELEASE_NOTES_FILE:-}" && -f "${RELEASE_NOTES_FILE}" ]]; then
+    # Release train: notes prepared from CHANGELOG.md (English first, then Simplified Chinese).
+    cp "${RELEASE_NOTES_FILE}" "$work_dir/notes.md"
+  else
   cat > "$work_dir/notes.md" <<'NOTES'
 ## English
 - Refined Settings into a native grouped form with aligned controls and a compact app identity row.
@@ -168,6 +172,7 @@ if ! gh release view "v${version}" --repo "$SOURCE_REPO" >/dev/null 2>&1; then
 - 全部设置一屏可见，无需滚动，支持英文与简体中文。
 - 保留镜像、自启、更新和退出能力；打开设置不会启动摄像头。
 NOTES
+  fi
   gh release create "v${version}" --repo "$SOURCE_REPO" --title "Mirror ${version}" --notes-file "$work_dir/notes.md"
 fi
 for asset_path in "$dmg_path#Mirror.dmg" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml"; do
