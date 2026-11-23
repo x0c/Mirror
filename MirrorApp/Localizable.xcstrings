@@ -145,6 +145,22 @@
         }
       }
     },
+    "settings.install_update": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install Update (%@)…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安装 %@ 更新…"
+          }
+        }
+      }
+    },
     "settings.quit": {
       "localizations": {
         "en": {

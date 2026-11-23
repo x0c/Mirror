@@ -15,6 +15,7 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     private let checkForUpdatesHandler: () -> Void
     private let onQuit: () -> Void
     private let iconStore: MenuBarIconStore
+    private var availableUpdateVersion: String?
 
     private lazy var visibilityItem = NSMenuItem(
         title: "显示镜像",
@@ -126,12 +127,26 @@ final class StatusBarController: NSObject, NSMenuDelegate {
         // 故意不把菜单挂到状态栏按钮上，这样左键单击可以直接打开镜像窗口。
     }
 
+    func setAvailableUpdateVersion(_ version: String?) {
+        availableUpdateVersion = version
+        refreshCheckForUpdatesTitle()
+    }
+
     func menuNeedsUpdate(_ menu: NSMenu) {
         visibilityItem.title = isVisibleHandler() ? "隐藏镜像" : "显示镜像"
         mirroringItem.state = isMirroredHandler() ? .on : .off
         launchAtLogin.refresh()
         launchAtLoginItem.state = launchAtLogin.status.menuTriState.controlState
         approveLaunchAtLoginItem.isHidden = !launchAtLogin.status.needsApprovalMapped
+        refreshCheckForUpdatesTitle()
+    }
+
+    private func refreshCheckForUpdatesTitle() {
+        if let availableUpdateVersion {
+            checkForUpdatesItem.title = String(format: String(localized: "settings.install_update"), availableUpdateVersion)
+        } else {
+            checkForUpdatesItem.title = String(localized: "settings.check_for_updates")
+        }
     }
 
     @objc

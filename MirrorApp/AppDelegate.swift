@@ -1,18 +1,14 @@
 import AppKit
 import MacKitCore
 import MacKitLifecycle
-import Sparkle
+import MacKitUpdater
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     /// 供设置窗调用；SwiftUI 生命周期下对 `NSApp.delegate` 转型常会失败。
     private(set) static weak var shared: AppDelegate?
 
     private var statusBarController: StatusBarController?
-    private let updaterController = SPUStandardUpdaterController(
-        startingUpdater: true,
-        updaterDelegate: nil,
-        userDriverDelegate: nil
-    )
+    private let appUpdater = SparkleUpdateChecker(gentleReminderMode: .menuBarOnly)
     private var mirrorWindowController: MirrorWindowController?
     private var cameraSessionManager: CameraSessionManager?
     private var cameraPermissionObserver: NSObjectProtocol?
@@ -21,6 +17,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let terminationGuard = TerminationGuard()
     /// 后台就绪时刻；二次启动防呆用。
     private var becameReadyAt: Date?
+
+    var updateAvailability: UpdateAvailabilityState {
+        appUpdater.availability
+    }
 
     override init() {
         super.init()
@@ -31,7 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         AppDelegate.shared = self
         NSApp.setActivationPolicy(.accessory)
         terminationGuard.isUpdateSessionInProgress = { [weak self] in
-            self?.updaterController.updater.sessionInProgress ?? false
+            self?.appUpdater.isSessionInProgress ?? false
         }
 
         // 图标即唯一主入口：禁止隐藏；若用户以前藏过，写回可见。
@@ -74,6 +74,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.requestTermination()
             }
         )
+        appUpdater.onAvailableVersionChange = { [weak self] version in
+            self?.statusBarController?.setAvailableUpdateVersion(version)
+        }
+        statusBarController?.setAvailableUpdateVersion(appUpdater.availableVersion)
 
         // 冷启动与登录项一律只就绪菜单栏；禁止自动开镜子/摄像头。
         becameReadyAt = Date()
@@ -141,7 +145,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func checkForUpdates() {
-        updaterController.checkForUpdates(nil)
+        appUpdater.checkForUpdates(nil)
     }
 
     func requestTermination() {

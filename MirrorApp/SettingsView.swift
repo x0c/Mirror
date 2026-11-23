@@ -1,4 +1,5 @@
 import AppKit
+import MacKitUpdater
 import SwiftUI
 
 struct SettingsView: View {
@@ -102,7 +103,7 @@ struct SettingsView: View {
             }
             .accessibilityElement(children: .combine)
             Spacer(minLength: 12)
-            Button("settings.check_for_updates") { AppDelegate.shared?.checkForUpdates() }
+            UpdateCheckButton(availability: AppDelegate.shared?.updateAvailability)
             Button("settings.quit") { AppDelegate.shared?.requestTermination() }
         }
     }
@@ -113,5 +114,22 @@ struct SettingsView: View {
         let status = AppDelegate.shared?.launchAtLoginSnapshot()
         launchAtLoginOn = status?.isOn ?? false
         launchNeedsApproval = status?.needsApproval ?? false
+    }
+}
+
+private struct UpdateCheckButton: View {
+    let availability: UpdateAvailabilityState?
+
+    var body: some View {
+        Button(title) {
+            AppDelegate.shared?.checkForUpdates()
+        }
+    }
+
+    private var title: String {
+        if let version = availability?.availableVersion {
+            return String(format: String(localized: "settings.install_update"), version)
+        }
+        return String(localized: "settings.check_for_updates")
     }
 }

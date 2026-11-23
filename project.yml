@@ -32,7 +32,7 @@ packages:
     from: "2.9.4"
   MacKit:
     url: https://github.com/x0c/mac-kit-swift
-    from: "0.1.4"
+    from: "0.1.5"
 
 targets:
   Mirror:
@@ -61,7 +61,7 @@ targets:
         NSHumanReadableCopyright: "Copyright © 2026 x0c"
         SUFeedURL: "https://github.com/x0c/Mirror/releases/latest/download/appcast.xml"
         SUEnableAutomaticChecks: true
-        SUAutomaticallyUpdate: true
+        SUAutomaticallyUpdate: false
         SURequireSignedFeed: true
         SUVerifyUpdateBeforeExtraction: true
         SUPublicEDKey: "sb9Ck3tZK1sEwUR2N/gLkNsiLcCX0J6FpP+Dft9VKck="
@@ -74,3 +74,5 @@ targets:
         product: MacKitLaunchAtLogin
       - package: MacKit
         product: MacKitLifecycle
+      - package: MacKit
+        product: MacKitUpdater
