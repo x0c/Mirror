@@ -1,5 +1,11 @@
 # Mirror 对外分发知识库
 
+## NeatMacApps migration
+
+The public name is **NeatMirror** and the canonical GitHub repository is `NeatMacApps/NeatMirror` (formerly `x0c/Mirror`). The repository and existing releases transfer together. The currently published binaries keep their original name until the first rebranded release.
+
+Preserve the bundle identifier, application bundle filename, signing keys, and user data paths so existing installations can upgrade in place. Keep the existing Sparkle Release-asset URL and `Mirror.dmg` download alias reachable for installed builds and old links. Never recreate the old GitHub slug.
+
 ## 正式交付标准
 
 Mirror 是公开自分发的 macOS 应用。每个正式版本同时交付两条完整路径：

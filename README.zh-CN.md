@@ -1,4 +1,6 @@
-# Mirror
+# NeatMirror
+
+原名 **Mirror**。目前的安装包仍显示旧名。
 
 <p align="center"><img src="docs/images/app-icon.png" alt="Mirror 应用图标" width="160"></p>
 
@@ -11,7 +13,7 @@
 需要 macOS 14 或更高版本。下载并打开已签名、公证的安装镜像：
 
 ```bash
-curl -fL https://github.com/x0c/Mirror/releases/latest/download/Mirror.dmg -o /tmp/Mirror.dmg && open /tmp/Mirror.dmg
+curl -fL https://github.com/NeatMacApps/NeatMirror/releases/latest/download/Mirror.dmg -o /tmp/Mirror.dmg && open /tmp/Mirror.dmg
 ```
 
 将 Mirror 拖入“应用程序”。后续更新通过应用内签名更新源提供。
@@ -34,8 +36,8 @@ curl -fL https://github.com/x0c/Mirror/releases/latest/download/Mirror.dmg -o /t
 需要 Xcode 26 或更高版本及 [XcodeGen](https://github.com/yonaskolb/XcodeGen)。
 
 ```bash
-git clone https://github.com/x0c/Mirror.git
-cd Mirror
+git clone https://github.com/NeatMacApps/NeatMirror.git
+cd NeatMirror
 xcodegen generate
 xcodebuild -project Mirror.xcodeproj -scheme Mirror -configuration Debug build
 ```

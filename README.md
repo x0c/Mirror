@@ -1,4 +1,6 @@
-# Mirror
+# NeatMirror
+
+Formerly **Mirror**. The current installer still shows the previous name.
 
 <p align="center"><img src="docs/images/app-icon.png" alt="Mirror app icon" width="160"></p>
 
@@ -11,7 +13,7 @@ A native macOS camera mirror with a floating, resizable preview and a menu bar e
 Requires macOS 14 or later. Download and open the signed, notarized installer:
 
 ```bash
-curl -fL https://github.com/x0c/Mirror/releases/latest/download/Mirror.dmg -o /tmp/Mirror.dmg && open /tmp/Mirror.dmg
+curl -fL https://github.com/NeatMacApps/NeatMirror/releases/latest/download/Mirror.dmg -o /tmp/Mirror.dmg && open /tmp/Mirror.dmg
 ```
 
 Drag Mirror into Applications. Updates are delivered through the signed in-app updater.
@@ -34,8 +36,8 @@ Window position, size, opacity and mirroring preferences are remembered locally.
 Requires Xcode 26 or later and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```bash
-git clone https://github.com/x0c/Mirror.git
-cd Mirror
+git clone https://github.com/NeatMacApps/NeatMirror.git
+cd NeatMirror
 xcodegen generate
 xcodebuild -project Mirror.xcodeproj -scheme Mirror -configuration Debug build
 ```
