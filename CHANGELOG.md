@@ -7,3 +7,13 @@ larger version step; `Release: hold <reason>` keeps the changes unreleased until
 the named acceptance is done.
 
 ## Unreleased
+
+## 1.0.14
+
+### English
+
+- Mirror is now NeatMirror. Update in place to keep your settings and permissions.
+
+### 简体中文
+
+- Mirror 更名为 NeatMirror。原地更新可保留设置和权限。

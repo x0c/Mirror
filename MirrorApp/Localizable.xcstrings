@@ -6,13 +6,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mirror Settings"
+            "value": "NeatMirror Settings"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mirror 设置"
+            "value": "NeatMirror 设置"
           }
         }
       }
@@ -22,7 +22,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mirror"
+            "value": "NeatMirror"
           }
         },
         "zh-Hans": {

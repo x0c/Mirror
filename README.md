@@ -1,6 +1,6 @@
 # NeatMirror
 
-Formerly **Mirror**. The current installer still shows the previous name.
+Formerly **Mirror**. Versions before 1.0.14 show the previous name. If you already have it installed, use Check for Updates in the app.
 
 <p align="center"><img src="docs/images/app-icon.png" alt="Mirror app icon" width="160"></p>
 

@@ -173,7 +173,7 @@ if ! gh release view "v${version}" --repo "$SOURCE_REPO" >/dev/null 2>&1; then
 - 保留镜像、自启、更新和退出能力；打开设置不会启动摄像头。
 NOTES
   fi
-  gh release create "v${version}" --repo "$SOURCE_REPO" --title "Mirror ${version}" --notes-file "$work_dir/notes.md"
+  gh release create "v${version}" --repo "$SOURCE_REPO" --title "NeatMirror ${version}" --notes-file "$work_dir/notes.md"
 fi
 for asset_path in "$dmg_path#Mirror.dmg" "$zip_path#Mirror-${version}.zip" "$appcast_dir/appcast.xml#appcast.xml"; do
   gh release upload "v${version}" "$asset_path" --repo "$SOURCE_REPO" --clobber

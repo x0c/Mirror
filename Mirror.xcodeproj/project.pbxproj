@@ -14,6 +14,7 @@
 		350D6E0D3908E23D56C72158 /* MirrorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0246326DA58632EA987559B9 /* MirrorWindowController.swift */; };
 		41696B1BD7575AC21CC67C31 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C2ABAC840FDC0193EF1E84 /* SettingsView.swift */; };
 		4BCAABE5B90056AC2FA66E3B /* MirrorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BDA81A34E10BAA089954096 /* MirrorApp.swift */; };
+		4D19DAC233DD0C8D2082A046 /* MacKitUpdater in Frameworks */ = {isa = PBXBuildFile; productRef = F916C60035D2132397560FC6 /* MacKitUpdater */; };
 		6D97566101DD30A780A859B4 /* MacKitLifecycle in Frameworks */ = {isa = PBXBuildFile; productRef = C75383357A2C5C38C51A6488 /* MacKitLifecycle */; };
 		72D5C296EDF876AE28E7A601 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 602BFFF476991A9B6215E2AC /* Sparkle */; };
 		746DBF28E92F9C8C1A354D1F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D823A35DF15C8E2262C1DB /* AppDelegate.swift */; };
@@ -22,6 +23,7 @@
 		D206BA69CCFCBD821C5FC0EC /* CameraSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */; };
 		E73278DB4AEC9C66421345E2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F1B76CDDD525FA0E8EA23FDA /* Localizable.xcstrings */; };
 		E9FA823A77FB15D6CF60776C /* MacKitCore in Frameworks */ = {isa = PBXBuildFile; productRef = 15CAF807F43F7068E3E66F71 /* MacKitCore */; };
+		EAA02541216F6B279732CD1F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F0E1CDCBF66AD3CC4DFF9CB1 /* InfoPlist.strings */; };
 		F8373F23C647D12EFB8C56E8 /* MirrorWindowGestures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B201F3C7AFD222E56EBA4836 /* MirrorWindowGestures.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +35,7 @@
 		35960FD09F72B72F06D15454 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
 		35C2ABAC840FDC0193EF1E84 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4CDA7D800FFF754BA56562DC /* CameraSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionManager.swift; sourceTree = "<group>"; };
+		6314B49CE8A798C6BF4B3487 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		83D823A35DF15C8E2262C1DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A7694174E706F8BA4FE189A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B201F3C7AFD222E56EBA4836 /* MirrorWindowGestures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MirrorWindowGestures.swift; sourceTree = "<group>"; };
@@ -41,6 +44,7 @@
 		D4E6770F8388BD9E0D219A27 /* Mirror.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Mirror.entitlements; sourceTree = "<group>"; };
 		F1B76CDDD525FA0E8EA23FDA /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F83C6AEEDEDBC96ACB2EA50A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FEBB602881AEE12FD2253C1F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +56,7 @@
 				E9FA823A77FB15D6CF60776C /* MacKitCore in Frameworks */,
 				82CD14E064B963F393FA076C /* MacKitLaunchAtLogin in Frameworks */,
 				6D97566101DD30A780A859B4 /* MacKitLifecycle in Frameworks */,
+				4D19DAC233DD0C8D2082A046 /* MacKitUpdater in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +80,7 @@
 				35C2ABAC840FDC0193EF1E84 /* SettingsView.swift */,
 				35960FD09F72B72F06D15454 /* SettingsWindowController.swift */,
 				C85C787AFF011A304E57654E /* StatusBarController.swift */,
+				F0E1CDCBF66AD3CC4DFF9CB1 /* InfoPlist.strings */,
 			);
 			path = MirrorApp;
 			sourceTree = "<group>";
@@ -116,6 +122,7 @@
 				15CAF807F43F7068E3E66F71 /* MacKitCore */,
 				2335417DD19E9EFCB176AFCA /* MacKitLaunchAtLogin */,
 				C75383357A2C5C38C51A6488 /* MacKitLifecycle */,
+				F916C60035D2132397560FC6 /* MacKitUpdater */,
 			);
 			productName = Mirror;
 			productReference = 1AEC7BFFF344962F26EC8458 /* Mirror.app */;
@@ -165,6 +172,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1AD7F95A83BA08E292013942 /* Assets.xcassets in Resources */,
+				EAA02541216F6B279732CD1F /* InfoPlist.strings in Resources */,
 				E73278DB4AEC9C66421345E2 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -190,6 +198,18 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		F0E1CDCBF66AD3CC4DFF9CB1 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6314B49CE8A798C6BF4B3487 /* en */,
+				FEBB602881AEE12FD2253C1F /* zh-Hans */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		90123DE5EDB51C5CD527A90C /* Debug */ = {
@@ -266,14 +286,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.13;
+				MARKETING_VERSION = 1.0.14;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -350,14 +370,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MirrorApp/Mirror.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				INFOPLIST_FILE = MirrorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.13;
+				MARKETING_VERSION = 1.0.14;
 				PRODUCT_BUNDLE_IDENTIFIER = com.x0c.mirror;
 				SDKROOT = macosx;
 			};
@@ -400,7 +420,7 @@
 			repositoryURL = "https://github.com/x0c/mac-kit-swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.4;
+				minimumVersion = 0.1.5;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -425,6 +445,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CB98A4945E7E73DC6CAD2F87 /* XCRemoteSwiftPackageReference "mac-kit-swift" */;
 			productName = MacKitLifecycle;
+		};
+		F916C60035D2132397560FC6 /* MacKitUpdater */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CB98A4945E7E73DC6CAD2F87 /* XCRemoteSwiftPackageReference "mac-kit-swift" */;
+			productName = MacKitUpdater;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

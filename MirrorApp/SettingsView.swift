@@ -96,7 +96,7 @@ struct SettingsView: View {
                 .frame(width: 32, height: 32)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
-                Text(verbatim: "Mirror").fontWeight(.medium)
+                Text(verbatim: "NeatMirror").fontWeight(.medium)
                 Text(verbatim: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)

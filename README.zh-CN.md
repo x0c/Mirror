@@ -1,6 +1,6 @@
 # NeatMirror
 
-原名 **Mirror**。目前的安装包仍显示旧名。
+原名 **Mirror**。1.0.14 之前的版本仍显示旧名；已有安装可在应用内更新。
 
 <p align="center"><img src="docs/images/app-icon.png" alt="Mirror 应用图标" width="160"></p>
 
